@@ -1,0 +1,94 @@
+import React from 'react';
+import { useApp } from '../context/AppContext';
+import {
+  LayoutDashboard, ArrowLeftRight, Users, FolderKanban,
+  Trophy, Sparkles, Send, Settings, School
+} from 'lucide-react';
+
+export const Sidebar: React.FC = () => {
+  const { activeTab, setActiveTab, chatChannels, swapRequests, currentUser } = useApp();
+
+  const isTeacher = currentUser.role === 'teacher';
+  const pendingSwapsCount = swapRequests.filter(s => s.status === 'pending').length;
+  const unreadChatCount = chatChannels.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+
+  const navItems = [
+    {
+      id: 'dashboard',
+      label: isTeacher ? 'Teacher Dashboard' : 'Student Dashboard',
+      icon: isTeacher ? School : LayoutDashboard
+    },
+    { id: 'skills', label: 'Skills Exchange', icon: ArrowLeftRight, badge: pendingSwapsCount > 0 ? pendingSwapsCount : undefined },
+    { id: 'ai-team', label: 'AI Team Finder', icon: Users, isAi: true },
+    { id: 'projects', label: 'Project Hub', icon: FolderKanban },
+    { id: 'hackathons', label: 'Hackathons', icon: Trophy },
+    { id: 'ai-career', label: 'AI Career Suite', icon: Sparkles, isAi: true },
+    { id: 'chat', label: 'Messages & Chat', icon: Send, badge: unreadChatCount > 0 ? unreadChatCount : undefined },
+    { id: 'settings', label: 'Settings & Account', icon: Settings },
+  ];
+
+  return (
+    <>
+      {/* Desktop Left Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-1 shrink-0 min-h-[calc(100vh-4rem)]">
+        <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          Main Navigation
+        </div>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                isActive
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 font-semibold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.isAi ? 'text-purple-500' : 'text-slate-400'}`} />
+                <span>{item.label}</span>
+              </div>
+              {item.isAi && !isActive && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                  AI
+                </span>
+              )}
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  isActive ? 'bg-white text-indigo-700' : 'bg-rose-500 text-white'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </aside>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around">
+        {navItems.slice(0, 5).map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition-all ${
+                isActive
+                  ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400'
+              }`}
+            >
+              <Icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">{item.label.split(' ')[0]}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </>
+  );
+};
