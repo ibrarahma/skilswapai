@@ -2,8 +2,40 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Sparkles, ArrowLeftRight, Users, FolderKanban, Trophy,
-  FileText, ArrowUpRight, ShieldCheck, CheckCircle, Clock, Star
+  ChevronRight, Clock, Star
 } from 'lucide-react';
+
+export const formatDisplayName = (rawName?: string): string => {
+  if (!rawName) return '';
+  const trimmed = rawName.trim();
+  if (!trimmed) return '';
+  return trimmed
+    .split(/\s+/)
+    .map((word) => {
+      const clean = word.replace(/\./g, '');
+      if (/^md$/i.test(clean)) {
+        return word.toUpperCase();
+      }
+      if (word === word.toUpperCase() || word === word.toLowerCase()) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      return word;
+    })
+    .join(' ');
+};
+
+const DASHBOARD_BUTTON_VARIANTS = {
+  primary:
+    'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
+  secondary:
+    'inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-indigo-700 text-xs font-bold shadow-md transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700',
+  outline:
+    'inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 backdrop-blur-md text-white text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700',
+  textLink:
+    'inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline shrink-0 whitespace-nowrap transition-colors cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+  destructive:
+    'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2',
+} as const;
 
 export const DashboardView: React.FC = () => {
   const {
@@ -22,11 +54,11 @@ export const DashboardView: React.FC = () => {
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 text-white p-6 sm:p-8 shadow-xl shadow-indigo-500/10">
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-indigo-100 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
             <span>AI-Powered Student Hub</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Hello, {currentUser.name}! 👋
+            Hello, {formatDisplayName(currentUser.name)}! 👋
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-indigo-100/90 leading-relaxed">
             {activeRole === 'student' && 'Ready to learn new skills, find hackathon teammates, and build resume-worthy projects today?'}
@@ -37,17 +69,19 @@ export const DashboardView: React.FC = () => {
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
+              type="button"
               onClick={() => setActiveTab('ai-career')}
-              className="px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-bold text-xs shadow-lg hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer"
+              className={DASHBOARD_BUTTON_VARIANTS.secondary}
             >
-              <Sparkles className="w-4 h-4 text-purple-600" />
+              <Sparkles className="w-4 h-4 text-purple-600" aria-hidden="true" />
               <span>Launch AI Career Suite</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('skills')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer"
+              className={DASHBOARD_BUTTON_VARIANTS.outline}
             >
-              <ArrowLeftRight className="w-4 h-4" />
+              <ArrowLeftRight className="w-4 h-4" aria-hidden="true" />
               <span>Explore Skill Swap</span>
             </button>
           </div>
@@ -61,7 +95,7 @@ export const DashboardView: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
           <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
-            <ArrowLeftRight className="w-5 h-5" />
+            <ArrowLeftRight className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -73,7 +107,7 @@ export const DashboardView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
           <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
-            <FolderKanban className="w-5 h-5" />
+            <FolderKanban className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{myProjects.length}</div>
@@ -83,7 +117,7 @@ export const DashboardView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
-            <Trophy className="w-5 h-5" />
+            <Trophy className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -95,10 +129,13 @@ export const DashboardView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
           <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
-            <Star className="w-5 h-5" />
+            <Star className="w-5 h-5" strokeWidth={2} fill="none" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{currentUser.rating} ★</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-slate-100 inline-flex items-center gap-1.5">
+              <span>{currentUser.rating}</span>
+              <Star className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" strokeWidth={2} fill="none" aria-hidden="true" />
+            </div>
             <div className="text-xs text-slate-500 dark:text-slate-400">Peer Trust Score</div>
           </div>
         </div>
@@ -112,22 +149,23 @@ export const DashboardView: React.FC = () => {
           
           {/* Skill Swap Requests */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <ArrowLeftRight className="w-4 h-4 text-indigo-600" />
-                <span>Pending Skill Swap Proposals ({pendingSwaps.length})</span>
-              </h3>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 min-w-0">
+                <ArrowLeftRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" aria-hidden="true" />
+                <span className="truncate">Pending Skill Swap Proposals ({pendingSwaps.length})</span>
+              </h2>
               <button
+                type="button"
                 onClick={() => setActiveTab('skills')}
-                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                className={DASHBOARD_BUTTON_VARIANTS.textLink}
               >
                 <span>View Marketplace</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               </button>
             </div>
 
             {pendingSwaps.length === 0 ? (
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
                 No pending swap proposals right now. Request a skill swap with fellow students!
               </div>
             ) : (
@@ -136,17 +174,24 @@ export const DashboardView: React.FC = () => {
                   const senderProfile = users.find(u => u.id === s.senderId);
                   return (
                     <div key={s.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <img src={s.senderAvatar} alt={s.senderName} className="w-10 h-10 rounded-full object-cover" />
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">{s.senderName}</h4>
-                          <p className="text-[11px] text-slate-500">
-                            Teaches <span className="font-semibold text-indigo-600">{s.teachSkill}</span> for <span className="font-semibold text-purple-600">{s.learnSkill}</span>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src={s.senderAvatar}
+                          alt={formatDisplayName(s.senderName)}
+                          className="w-10 h-10 rounded-full object-cover shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                            {formatDisplayName(s.senderName)}
+                          </h3>
+                          <p className="text-xs text-slate-600 dark:text-slate-300">
+                            Teaches <span className="font-semibold text-indigo-600 dark:text-indigo-400">{s.teachSkill}</span> for <span className="font-semibold text-purple-600 dark:text-purple-400">{s.learnSkill}</span>
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
                         <button
+                          type="button"
                           onClick={async () => {
                             await acceptSwapRequest(s.id);
                             if (senderProfile) {
@@ -155,13 +200,14 @@ export const DashboardView: React.FC = () => {
                               setActiveTab('chat');
                             }
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-sm hover:bg-indigo-700 transition-all cursor-pointer"
+                          className={DASHBOARD_BUTTON_VARIANTS.primary}
                         >
                           Accept & Chat
                         </button>
                         <button
+                          type="button"
                           onClick={() => rejectSwapRequest(s.id)}
-                          className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 text-xs font-semibold hover:bg-rose-50 transition-all cursor-pointer"
+                          className={DASHBOARD_BUTTON_VARIANTS.destructive}
                         >
                           Decline
                         </button>
@@ -175,14 +221,14 @@ export const DashboardView: React.FC = () => {
 
           {/* Active Skills Progress Bars */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
               <span>Skill Level & Mastery Roadmap</span>
-            </h3>
+            </h2>
 
             <div className="space-y-3">
               {currentUser.skillsToTeach.length === 0 ? (
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
                   You haven't listed any teaching skills yet. Add your skills in Settings or on your Profile!
                 </div>
               ) : (
@@ -210,21 +256,23 @@ export const DashboardView: React.FC = () => {
         <div className="space-y-6">
           
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <Users className="w-4 h-4 text-purple-600" />
-                <span>AI Recommended Matches</span>
-              </h3>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 min-w-0">
+                <Users className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
+                <span className="truncate">AI Recommended Matches</span>
+              </h2>
               <button
+                type="button"
                 onClick={() => setActiveTab('ai-team')}
-                className="text-xs text-indigo-600 font-semibold hover:underline"
+                className={DASHBOARD_BUTTON_VARIANTS.textLink}
               >
-                All Matches
+                <span>All Matches</span>
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               </button>
             </div>
 
             {recommendedTeammates.length === 0 ? (
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
                 No other registered students found yet. As genuine classmates register, their profiles will appear here!
               </div>
             ) : (
@@ -233,27 +281,36 @@ export const DashboardView: React.FC = () => {
                   <div
                     key={u.id}
                     onClick={() => setSelectedUserProfile(u)}
-                    className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all space-y-2"
+                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all space-y-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <img src={u.avatar} alt={u.name} className="w-9 h-9 rounded-full object-cover" />
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">{u.name}</h4>
-                          <p className="text-[10px] text-slate-400">{u.college}</p>
-                        </div>
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={u.avatar}
+                        alt={formatDisplayName(u.name)}
+                        className="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700"
+                      />
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug break-words">
+                          {formatDisplayName(u.name)}
+                        </h3>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-snug break-words">
+                          {u.college}
+                        </p>
                       </div>
-                      <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                        {u.compatibilityScore || 90}% Match
-                      </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-1">
-                      {u.skillsToTeach.slice(0, 2).map((st) => (
-                        <span key={st.id} className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-medium">
-                          {st.name}
-                        </span>
-                      ))}
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/70 dark:border-slate-700/50 flex-wrap">
+                      <span className="inline-flex items-center text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 shrink-0">
+                        {u.compatibilityScore || 90}% Match
+                      </span>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {u.skillsToTeach.slice(0, 2).map((st) => (
+                          <span key={st.id} className="text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-medium">
+                            {st.name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -264,19 +321,23 @@ export const DashboardView: React.FC = () => {
           {/* Upcoming Hackathon Banner */}
           <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-900 to-slate-900 text-white space-y-3 shadow-lg">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-200 border border-purple-500/30">
                 Live Hackathon
               </span>
-              <Clock className="w-4 h-4 text-purple-400" />
+              <Clock className="w-4 h-4 text-purple-300" aria-hidden="true" />
             </div>
-            <h4 className="text-sm font-bold">{hackathons[0]?.title}</h4>
-            <p className="text-xs text-purple-200/80 line-clamp-2">{hackathons[0]?.description}</p>
-            <button
-              onClick={() => setActiveTab('hackathons')}
-              className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-md transition-all"
-            >
-              Register & Form Team
-            </button>
+            <h3 className="text-sm font-bold">{hackathons[0]?.title}</h3>
+            <p className="text-xs text-purple-100/90 line-clamp-2">{hackathons[0]?.description}</p>
+            <div className="pt-1 flex">
+              <button
+                type="button"
+                onClick={() => setActiveTab('hackathons')}
+                className={DASHBOARD_BUTTON_VARIANTS.primary}
+              >
+                <span>Register & Form Team</span>
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              </button>
+            </div>
           </div>
 
         </div>

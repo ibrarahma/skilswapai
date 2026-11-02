@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { UserProfile } from '../../types';
+import { formatDisplayName } from '../dashboard/DashboardView';
+import { UNIFIED_SEARCH_INPUT_CLASS } from '../Navbar';
 import {
   ArrowLeftRight,
   Search,
@@ -19,6 +21,19 @@ import {
   Send,
   BookOpen,
 } from 'lucide-react';
+
+export const SKILLS_BUTTON_VARIANTS = {
+  primary:
+    'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
+  secondary:
+    'inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition-all cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
+  ghost:
+    'inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold transition-all cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
+  outline:
+    'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
+  destructive:
+    'inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-semibold transition-all cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2',
+} as const;
 
 export const SkillsExchange: React.FC = () => {
   const {
@@ -144,22 +159,23 @@ export const SkillsExchange: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-2">
-            <ArrowLeftRight className="w-3.5 h-3.5" />
+            <ArrowLeftRight className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Student–Teacher Discovery & Skill Exchange</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-slate-100">
             Connect, Exchange Skills & Collaborate
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             Discover verified students and faculty mentors by name, @username, department, or subject expertise.
           </p>
         </div>
 
         <button
+          type="button"
           onClick={() => setSelectedUserProfile(currentUser)}
-          className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all shrink-0 cursor-pointer"
+          className={SKILLS_BUTTON_VARIANTS.primary}
         >
-          + Update My Skills & Profile
+          <span>+ Update My Skills & Profile</span>
         </button>
       </div>
 
@@ -168,29 +184,29 @@ export const SkillsExchange: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveSubTab('discover')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+          className={
             activeSubTab === 'discover'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
+              ? SKILLS_BUTTON_VARIANTS.primary
+              : SKILLS_BUTTON_VARIANTS.outline
+          }
         >
-          <Search className="w-3.5 h-3.5" />
+          <Search className="w-3.5 h-3.5" aria-hidden="true" />
           <span>Discover Members ({filteredMembers.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubTab('swaps')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+          className={
             activeSubTab === 'swaps'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
+              ? SKILLS_BUTTON_VARIANTS.primary
+              : SKILLS_BUTTON_VARIANTS.outline
+          }
         >
-          <ArrowLeftRight className="w-3.5 h-3.5" />
+          <ArrowLeftRight className="w-3.5 h-3.5" aria-hidden="true" />
           <span>Skill Swap Requests</span>
           {pendingIncomingSwapsCount > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white">
+            <span className="px-1.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-500 text-white">
               {pendingIncomingSwapsCount}
             </span>
           )}
@@ -199,29 +215,29 @@ export const SkillsExchange: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveSubTab('connections')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+          className={
             activeSubTab === 'connections'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
+              ? SKILLS_BUTTON_VARIANTS.primary
+              : SKILLS_BUTTON_VARIANTS.outline
+          }
         >
-          <Users className="w-3.5 h-3.5" />
+          <Users className="w-3.5 h-3.5" aria-hidden="true" />
           <span>My Connections ({acceptedConnections.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubTab('requests')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+          className={
             activeSubTab === 'requests'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-          }`}
+              ? SKILLS_BUTTON_VARIANTS.primary
+              : SKILLS_BUTTON_VARIANTS.outline
+          }
         >
-          <UserPlus className="w-3.5 h-3.5" />
+          <UserPlus className="w-3.5 h-3.5" aria-hidden="true" />
           <span>Connection Requests</span>
           {receivedConnectionRequests.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white">
+            <span className="px-1.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-500 text-white">
               {receivedConnectionRequests.length}
             </span>
           )}
@@ -235,18 +251,29 @@ export const SkillsExchange: React.FC = () => {
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
             <div className="flex flex-col md:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" aria-hidden="true" />
                 <input
                   type="text"
+                  aria-label="Search Skills Exchange members"
                   placeholder="Search by name, @username, institution, department, skills, or subjects..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/30 outline-none"
+                  className={UNIFIED_SEARCH_INPUT_CLASS}
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear Skills Exchange search"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Role Filter Pills */}
-              <div className="flex items-center gap-1.5 w-full md:w-auto">
+              <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
                 {[
                   { id: 'all', label: 'All Roles' },
                   { id: 'student', label: 'Students' },
@@ -256,11 +283,11 @@ export const SkillsExchange: React.FC = () => {
                     key={r.id}
                     type="button"
                     onClick={() => setRoleFilter(r.id as any)}
-                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={
                       roleFilter === r.id
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                    }`}
+                        ? SKILLS_BUTTON_VARIANTS.primary
+                        : SKILLS_BUTTON_VARIANTS.outline
+                    }
                   >
                     {r.label}
                   </button>
@@ -269,9 +296,10 @@ export const SkillsExchange: React.FC = () => {
 
               <div className="flex items-center gap-2 w-full md:w-auto">
                 <select
+                  aria-label="Filter by skill level"
                   value={selectedLevel}
                   onChange={(e) => setSelectedLevel(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
+                  className="h-10 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
                 >
                   <option value="All">All Skill Levels</option>
                   {levels.slice(1).map((l) => (
@@ -288,17 +316,25 @@ export const SkillsExchange: React.FC = () => {
               {categories.map((cat) => (
                 <button
                   key={cat}
+                  type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={
                     selectedCategory === cat
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`}
+                      ? SKILLS_BUTTON_VARIANTS.primary
+                      : SKILLS_BUTTON_VARIANTS.outline
+                  }
                 >
                   {cat}
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Section Heading for Logical H1 -> H2 -> H3 Hierarchy */}
+          <div className="flex items-center justify-between gap-2 px-1">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+              Verified Students & Faculty Mentors ({filteredMembers.length})
+            </h2>
           </div>
 
           {/* Member Cards Grid */}
@@ -322,7 +358,7 @@ export const SkillsExchange: React.FC = () => {
                     setRoleFilter('all');
                     setSearchQuery('');
                   }}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-sm cursor-pointer"
+                  className={SKILLS_BUTTON_VARIANTS.primary}
                 >
                   Reset Filters
                 </button>
@@ -333,71 +369,72 @@ export const SkillsExchange: React.FC = () => {
               {filteredMembers.map((member) => {
                 const isMemberTeacher = member.role === 'teacher';
                 const conn = getConnectionWithUser(member.id);
+                const displayName = formatDisplayName(member.name);
 
                 return (
                   <div
                     key={member.id}
-                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col h-full group"
                   >
-                    <div>
+                    <div className="flex-1 flex flex-col">
                       {/* Header */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <img
-                            src={member.avatar}
-                            alt={member.name}
-                            onClick={() => setSelectedUserProfile(member)}
-                            className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 cursor-pointer shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <h3
-                                onClick={() => setSelectedUserProfile(member)}
-                                className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 cursor-pointer truncate"
-                              >
-                                {member.name}
-                              </h3>
-                              {member.verificationStatus === 'verified' && (
-                                <ShieldCheck
-                                  className="w-4 h-4 text-indigo-500 shrink-0"
-                                  title="Verified Account"
-                                />
-                              )}
-                            </div>
-
-                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400">
-                                @{member.username || member.id.slice(0, 8)}
-                              </span>
-                              <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                                  isMemberTeacher
-                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
-                                    : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                                }`}
-                              >
-                                {isMemberTeacher ? (
-                                  <School className="w-2.5 h-2.5" />
-                                ) : (
-                                  <GraduationCap className="w-2.5 h-2.5" />
-                                )}
-                                <span>{isMemberTeacher ? 'Teacher' : 'Student'}</span>
-                              </span>
-                            </div>
-
-                            <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-1 truncate">
-                              <GraduationCap className="w-3 h-3 text-indigo-500 shrink-0" />
-                              <span className="truncate">
-                                {member.college || member.institution || 'MANUU, Hyderabad'}
-                                {member.department ? ` • ${member.department}` : ''}
-                              </span>
-                            </p>
+                      <div className="flex items-start gap-3 mb-3">
+                        <img
+                          src={member.avatar}
+                          alt={displayName}
+                          onClick={() => setSelectedUserProfile(member)}
+                          className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 cursor-pointer shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3
+                              onClick={() => setSelectedUserProfile(member)}
+                              className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 cursor-pointer truncate"
+                            >
+                              {displayName}
+                            </h3>
+                            {member.verificationStatus === 'verified' && (
+                              <ShieldCheck
+                                className="w-4 h-4 text-indigo-500 shrink-0"
+                                title="Verified Account"
+                              />
+                            )}
+                            <span
+                              className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold text-xs bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-800/50 px-2 py-0.5 rounded-lg shrink-0"
+                              title="Peer Rating"
+                            >
+                              <Star className="w-3 h-3 fill-amber-500 text-amber-500 shrink-0" aria-hidden="true" />
+                              <span>{member.rating || 5.0}</span>
+                            </span>
                           </div>
-                        </div>
 
-                        <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg shrink-0">
-                          <Star className="w-3 h-3 fill-amber-500" />
-                          <span>{member.rating || 5.0}</span>
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
+                              @{member.username || member.id.slice(0, 8)}
+                            </span>
+                            <span
+                              className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                                isMemberTeacher
+                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
+                                  : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                              }`}
+                            >
+                              {isMemberTeacher ? (
+                                <School className="w-3 h-3" aria-hidden="true" />
+                              ) : (
+                                <GraduationCap className="w-3 h-3" aria-hidden="true" />
+                              )}
+                              <span>{isMemberTeacher ? 'Teacher' : 'Student'}</span>
+                            </span>
+                          </div>
+
+                          <p className="text-[13px] leading-snug text-slate-600 dark:text-slate-300 flex items-center gap-1.5 mt-1.5 truncate">
+                            <GraduationCap className="w-3.5 h-3.5 text-indigo-500 shrink-0" aria-hidden="true" />
+                            <span className="truncate">
+                              {member.college || member.institution || 'MANUU, Hyderabad'}
+                              {member.department ? ` • ${member.department}` : ''}
+                            </span>
+                          </p>
                         </div>
                       </div>
 
@@ -410,15 +447,15 @@ export const SkillsExchange: React.FC = () => {
                         member.subjectsAndExpertise &&
                         member.subjectsAndExpertise.length > 0 && (
                           <div className="space-y-1.5 mb-3">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1">
-                              <BookOpen className="w-3 h-3" />
-                              <span>Subjects & Expertise</span>
+                            <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                              <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
+                              <span>Subjects & expertise</span>
                             </span>
                             <div className="flex flex-wrap gap-1.5">
                               {member.subjectsAndExpertise.map((sub, i) => (
                                 <span
                                   key={i}
-                                  className="text-[11px] font-medium px-2.5 py-0.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40"
+                                  className="text-xs font-medium px-2.5 py-0.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40"
                                 >
                                   {sub}
                                 </span>
@@ -429,19 +466,19 @@ export const SkillsExchange: React.FC = () => {
 
                       {/* Skills to Teach */}
                       <div className="space-y-1.5 mb-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                          Can Teach / Mentor
+                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">
+                          Can teach / mentor
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {member.skillsToTeach.length === 0 ? (
-                            <span className="text-[11px] text-slate-400 italic">
+                            <span className="text-xs text-slate-400 italic">
                               No teaching skills listed yet
                             </span>
                           ) : (
                             member.skillsToTeach.map((st) => (
                               <span
                                 key={st.id}
-                                className="text-[11px] font-medium px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40"
+                                className="text-xs font-medium px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40"
                               >
                                 {st.name} ({st.level})
                               </span>
@@ -452,15 +489,15 @@ export const SkillsExchange: React.FC = () => {
 
                       {/* Skills to Learn */}
                       {member.skillsToLearn.length > 0 && (
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                            Looking to Learn
+                        <div className="space-y-1.5 mb-3">
+                          <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">
+                            Looking to learn
                           </span>
                           <div className="flex flex-wrap gap-1.5">
                             {member.skillsToLearn.map((sl) => (
                               <span
                                 key={sl.id}
-                                className="text-[11px] font-medium px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40"
+                                className="text-xs font-medium px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40"
                               >
                                 {sl.name}
                               </span>
@@ -470,14 +507,14 @@ export const SkillsExchange: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Bottom Actions */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+                    {/* Bottom Action Footer aligned with margin-top: auto */}
+                    <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={() => setSelectedUserProfile(member)}
-                        className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                        className={SKILLS_BUTTON_VARIANTS.ghost}
                       >
-                        View Profile
+                        <span>View Profile</span>
                       </button>
 
                       <div className="flex flex-wrap items-center gap-1.5">
@@ -486,37 +523,37 @@ export const SkillsExchange: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => sendConnectionRequest(member)}
-                            className="px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                            className={SKILLS_BUTTON_VARIANTS.secondary}
                           >
-                            <UserPlus className="w-3.5 h-3.5" />
+                            <UserPlus className="w-3.5 h-3.5" aria-hidden="true" />
                             <span>Connect</span>
                           </button>
                         ) : conn.status === 'Pending' && conn.senderUid === currentUser.id ? (
                           <button
                             type="button"
                             onClick={() => cancelConnectionRequest(conn.id)}
-                            className="px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                            className={SKILLS_BUTTON_VARIANTS.secondary}
                             title="Cancel sent connection request"
                           >
-                            <Clock className="w-3.5 h-3.5" />
+                            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                             <span>Requested</span>
                           </button>
                         ) : conn.status === 'Pending' && conn.receiverUid === currentUser.id ? (
                           <button
                             type="button"
                             onClick={() => acceptConnectionRequest(conn.id)}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                            className={SKILLS_BUTTON_VARIANTS.primary}
                           >
-                            <Check className="w-3.5 h-3.5" />
+                            <Check className="w-3.5 h-3.5" aria-hidden="true" />
                             <span>Accept</span>
                           </button>
                         ) : (
                           <button
                             type="button"
                             onClick={() => openDirectChat(member)}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                            className={SKILLS_BUTTON_VARIANTS.secondary}
                           >
-                            <Send className="w-3 h-3" />
+                            <Send className="w-3 h-3" aria-hidden="true" />
                             <span>Message</span>
                           </button>
                         )}
@@ -536,10 +573,10 @@ export const SkillsExchange: React.FC = () => {
                                 'Embedded Systems'
                             );
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm flex items-center gap-1 transition-all cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.primary}
                         >
-                          <ArrowLeftRight className="w-3.5 h-3.5" />
-                          <span>Swap</span>
+                          <ArrowLeftRight className="w-3.5 h-3.5" aria-hidden="true" />
+                          <span>Request Swap</span>
                         </button>
                       </div>
                     </div>
@@ -557,11 +594,11 @@ export const SkillsExchange: React.FC = () => {
           {/* Received Swap Requests */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+              <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
                 Received Skill Swap Requests ({incomingSwapRequests.length})
-              </h3>
+              </h2>
               {pendingIncomingSwapsCount > 0 && (
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500 text-white">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500 text-white">
                   {pendingIncomingSwapsCount} Pending
                 </span>
               )}
@@ -575,6 +612,7 @@ export const SkillsExchange: React.FC = () => {
               <div className="space-y-3">
                 {incomingSwapRequests.map((swap) => {
                   const senderProfile = users.find((u) => u.id === swap.senderId);
+                  const senderDisplayName = formatDisplayName(swap.senderName);
                   return (
                     <div
                       key={swap.id}
@@ -584,30 +622,30 @@ export const SkillsExchange: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <img
                             src={swap.senderAvatar}
-                            alt={swap.senderName}
+                            alt={senderDisplayName}
                             className="w-10 h-10 rounded-full object-cover"
                           />
                           <div>
-                            <h4
+                            <h3
                               onClick={() => senderProfile && setSelectedUserProfile(senderProfile)}
                               className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer"
                             >
-                              {swap.senderName}
-                            </h4>
-                            <p className="text-[11px] text-slate-500">
+                              {senderDisplayName}
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-slate-300">
                               Offers{' '}
-                              <span className="font-semibold text-indigo-600">
+                              <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                                 {swap.teachSkill}
                               </span>{' '}
                               ⇄ Wants{' '}
-                              <span className="font-semibold text-purple-600">
+                              <span className="font-semibold text-purple-600 dark:text-purple-400">
                                 {swap.learnSkill}
                               </span>
                             </p>
                           </div>
                         </div>
                         <span
-                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                          className={`text-xs font-bold px-2.5 py-0.5 rounded-full capitalize ${
                             swap.status === 'accepted'
                               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                               : swap.status === 'declined'
@@ -626,24 +664,24 @@ export const SkillsExchange: React.FC = () => {
                       )}
 
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-[10px] text-slate-400">{swap.createdAt}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">{swap.createdAt}</span>
                         <div className="flex items-center gap-2">
                           {swap.status === 'pending' && (
                             <>
                               <button
                                 type="button"
                                 onClick={() => acceptSwapRequest(swap.id)}
-                                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                                className={SKILLS_BUTTON_VARIANTS.primary}
                               >
-                                <Check className="w-3.5 h-3.5" />
+                                <Check className="w-3.5 h-3.5" aria-hidden="true" />
                                 <span>Accept</span>
                               </button>
                               <button
                                 type="button"
                                 onClick={() => rejectSwapRequest(swap.id)}
-                                className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                                className={SKILLS_BUTTON_VARIANTS.destructive}
                               >
-                                <X className="w-3.5 h-3.5" />
+                                <X className="w-3.5 h-3.5" aria-hidden="true" />
                                 <span>Decline</span>
                               </button>
                             </>
@@ -652,9 +690,9 @@ export const SkillsExchange: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => openDirectChat(senderProfile)}
-                              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                              className={SKILLS_BUTTON_VARIANTS.secondary}
                             >
-                              <Send className="w-3 h-3" />
+                              <Send className="w-3 h-3" aria-hidden="true" />
                               <span>Message</span>
                             </button>
                           )}
@@ -669,9 +707,9 @@ export const SkillsExchange: React.FC = () => {
 
           {/* Sent Swap Requests */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
               Sent Skill Swap Requests ({outgoingSwapRequests.length})
-            </h3>
+            </h2>
 
             {outgoingSwapRequests.length === 0 ? (
               <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
@@ -685,19 +723,19 @@ export const SkillsExchange: React.FC = () => {
                     className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3"
                   >
                     <div>
-                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                        To: {swap.receiverName}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Teach <span className="font-semibold text-indigo-600">{swap.teachSkill}</span>{' '}
-                        for <span className="font-semibold text-purple-600">{swap.learnSkill}</span>
+                      <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                        To: {formatDisplayName(swap.receiverName)}
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                        Teach <span className="font-semibold text-indigo-600 dark:text-indigo-400">{swap.teachSkill}</span>{' '}
+                        for <span className="font-semibold text-purple-600 dark:text-purple-400">{swap.learnSkill}</span>
                       </p>
-                      <span className="text-[10px] text-slate-400">{swap.createdAt}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">{swap.createdAt}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                        className={`text-xs font-bold px-2.5 py-0.5 rounded-full capitalize ${
                           swap.status === 'accepted'
                             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                             : swap.status === 'declined'
@@ -711,7 +749,7 @@ export const SkillsExchange: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => cancelSwapRequest(swap.id)}
-                          className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.destructive}
                         >
                           Cancel
                         </button>
@@ -730,9 +768,9 @@ export const SkillsExchange: React.FC = () => {
         <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+              <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
                 My Connected Network ({acceptedConnections.length})
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500">
                 Students and Teachers/Professors you are connected with. Start a real-time chat anytime.
               </p>
@@ -741,14 +779,14 @@ export const SkillsExchange: React.FC = () => {
 
           {acceptedConnections.length === 0 ? (
             <div className="p-8 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center space-y-3">
-              <Users className="w-8 h-8 text-slate-400 mx-auto" />
+              <Users className="w-8 h-8 text-slate-400 mx-auto" aria-hidden="true" />
               <p className="text-xs text-slate-500">
                 You don't have any active connections yet. Discover students and teachers to send a connection request!
               </p>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('discover')}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold cursor-pointer"
+                className={SKILLS_BUTTON_VARIANTS.primary}
               >
                 Explore Directory
               </button>
@@ -760,6 +798,7 @@ export const SkillsExchange: React.FC = () => {
                 const peerUid = isSender ? conn.receiverUid : conn.senderUid;
                 const peerUser = users.find((u) => u.id === peerUid);
                 const peerName = peerUser?.name || (isSender ? conn.receiverName : conn.senderName);
+                const peerDisplayName = formatDisplayName(peerName);
                 const peerUsername =
                   peerUser?.username || (isSender ? conn.receiverUsername : conn.senderUsername);
                 const peerAvatar =
@@ -789,25 +828,25 @@ export const SkillsExchange: React.FC = () => {
                 return (
                   <div
                     key={conn.id}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col justify-between gap-4"
+                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col justify-between gap-4 h-full"
                   >
                     <div className="flex items-start gap-3">
                       <img
                         src={peerAvatar}
-                        alt={peerName}
+                        alt={peerDisplayName}
                         onClick={() => setSelectedUserProfile(fallbackProfile)}
                         className="w-12 h-12 rounded-2xl object-cover cursor-pointer shrink-0"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h4
+                          <h3
                             onClick={() => setSelectedUserProfile(fallbackProfile)}
                             className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer truncate"
                           >
-                            {peerName}
-                          </h4>
+                            {peerDisplayName}
+                          </h3>
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                               peerRole === 'teacher'
                                 ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
                                 : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
@@ -816,39 +855,39 @@ export const SkillsExchange: React.FC = () => {
                             {peerRole === 'teacher' ? 'Teacher' : 'Student'}
                           </span>
                         </div>
-                        <p className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400">
+                        <p className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
                           @{peerUsername || peerUid.slice(0, 8)}
                         </p>
-                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                        <p className="text-[13px] text-slate-600 dark:text-slate-300 truncate mt-0.5">
                           {peerCollege}
                           {peerDept ? ` • ${peerDept}` : ''}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <div className="mt-auto flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60 dark:border-slate-700/60">
                       <button
                         type="button"
                         onClick={() => removeConnection(peerUid)}
-                        className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                        className={SKILLS_BUTTON_VARIANTS.destructive}
                       >
-                        Remove Connection
+                        Remove
                       </button>
 
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => setSelectedUserProfile(fallbackProfile)}
-                          className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.ghost}
                         >
-                          Profile
+                          View Profile
                         </button>
                         <button
                           type="button"
                           onClick={() => openDirectChat(fallbackProfile)}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.primary}
                         >
-                          <Send className="w-3 h-3" />
+                          <Send className="w-3 h-3" aria-hidden="true" />
                           <span>Message</span>
                         </button>
                       </div>
@@ -866,9 +905,9 @@ export const SkillsExchange: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Received Connection Requests */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
               Received Connection Requests ({receivedConnectionRequests.length})
-            </h3>
+            </h2>
 
             {receivedConnectionRequests.length === 0 ? (
               <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
@@ -878,6 +917,7 @@ export const SkillsExchange: React.FC = () => {
               <div className="space-y-3">
                 {receivedConnectionRequests.map((req) => {
                   const senderUser = users.find((u) => u.id === req.senderUid);
+                  const senderDisplayName = formatDisplayName(req.senderName);
                   return (
                     <div
                       key={req.id}
@@ -889,22 +929,22 @@ export const SkillsExchange: React.FC = () => {
                             req.senderAvatar ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(req.senderName)}`
                           }
-                          alt={req.senderName}
+                          alt={senderDisplayName}
                           className="w-10 h-10 rounded-full object-cover"
                         />
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <h4
+                            <h3
                               onClick={() => senderUser && setSelectedUserProfile(senderUser)}
                               className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer"
                             >
-                              {req.senderName}
-                            </h4>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 capitalize">
+                              {senderDisplayName}
+                            </h3>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 capitalize">
                               {req.senderRole}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="text-[13px] text-slate-600 dark:text-slate-300">
                             @{req.senderUsername} • {req.senderCollege}
                           </p>
                         </div>
@@ -914,17 +954,17 @@ export const SkillsExchange: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => acceptConnectionRequest(req.id)}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.primary}
                         >
-                          <UserCheck className="w-3.5 h-3.5" />
+                          <UserCheck className="w-3.5 h-3.5" aria-hidden="true" />
                           <span>Accept</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => rejectConnectionRequest(req.id)}
-                          className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          className={SKILLS_BUTTON_VARIANTS.destructive}
                         >
-                          <UserX className="w-3.5 h-3.5" />
+                          <UserX className="w-3.5 h-3.5" aria-hidden="true" />
                           <span>Reject</span>
                         </button>
                       </div>
@@ -937,9 +977,9 @@ export const SkillsExchange: React.FC = () => {
 
           {/* Sent Connection Requests */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
               Sent Connection Requests ({sentConnectionRequests.length})
-            </h3>
+            </h2>
 
             {sentConnectionRequests.length === 0 ? (
               <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
@@ -947,44 +987,47 @@ export const SkillsExchange: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {sentConnectionRequests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={
-                          req.receiverAvatar ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(req.receiverName)}`
-                        }
-                        alt={req.receiverName}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                            {req.receiverName}
-                          </h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 capitalize">
-                            {req.receiverRole}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500">
-                          @{req.receiverUsername} • {req.receiverCollege}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => cancelConnectionRequest(req.id)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
+                {sentConnectionRequests.map((req) => {
+                  const receiverDisplayName = formatDisplayName(req.receiverName);
+                  return (
+                    <div
+                      key={req.id}
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3"
                     >
-                      Cancel Request
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={
+                            req.receiverAvatar ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(req.receiverName)}`
+                          }
+                          alt={receiverDisplayName}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                              {receiverDisplayName}
+                            </h3>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 capitalize">
+                              {req.receiverRole}
+                            </span>
+                          </div>
+                          <p className="text-[13px] text-slate-600 dark:text-slate-300">
+                            @{req.receiverUsername} • {req.receiverCollege}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => cancelConnectionRequest(req.id)}
+                        className={SKILLS_BUTTON_VARIANTS.destructive}
+                      >
+                        Cancel Request
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -995,16 +1038,16 @@ export const SkillsExchange: React.FC = () => {
       {swapTargetUser && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
-              Swap Skill with {swapTargetUser.name}
-            </h3>
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+              Swap Skill with {formatDisplayName(swapTargetUser.name)}
+            </h2>
             <p className="text-xs text-slate-500 mb-4">
-              Select what you will teach in return! This creates a live Firebase request and notifies {swapTargetUser.name}.
+              Select what you will teach in return! This creates a live Firebase request and notifies {formatDisplayName(swapTargetUser.name)}.
             </p>
 
             {swapSuccess ? (
               <div className="py-6 text-center text-emerald-600 font-semibold space-y-2">
-                <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-500 animate-bounce" />
+                <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-500 animate-bounce" aria-hidden="true" />
                 <p>Skill Swap Request Delivered!</p>
               </div>
             ) : (
@@ -1018,7 +1061,7 @@ export const SkillsExchange: React.FC = () => {
                     required
                     value={teachSkillInput}
                     onChange={(e) => setTeachSkillInput(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
+                    className="w-full h-10 px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                   />
                 </div>
                 <div>
@@ -1030,7 +1073,7 @@ export const SkillsExchange: React.FC = () => {
                     required
                     value={learnSkillInput}
                     onChange={(e) => setLearnSkillInput(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
+                    className="w-full h-10 px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                   />
                 </div>
                 <div>
@@ -1042,20 +1085,20 @@ export const SkillsExchange: React.FC = () => {
                     placeholder="Hey! Are you free for a 1-hour session over Google Meet?"
                     value={swapMessage}
                     onChange={(e) => setSwapMessage(e.target.value)}
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                   />
                 </div>
-                <div className="flex items-center gap-2 pt-2">
+                <div className="flex items-center justify-end gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setSwapTargetUser(null)}
-                    className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold cursor-pointer"
+                    className={SKILLS_BUTTON_VARIANTS.outline}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-md cursor-pointer"
+                    className={SKILLS_BUTTON_VARIANTS.primary}
                   >
                     Send Invitation
                   </button>

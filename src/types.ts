@@ -48,6 +48,7 @@ export interface ProjectItem {
   techStack: string[];
   category: string;
   githubUrl?: string;
+  liveDemoUrl?: string;
   liveUrl?: string;
   likes: number;
   commentsCount: number;

@@ -147,8 +147,19 @@ function mapFirestoreDocToProject(docId: string, data: Record<string, any>): Pro
     description: data.description || '',
     techStack: Array.isArray(data.techStack) ? data.techStack : [],
     category: data.category || 'Web Dev',
-    githubUrl: data.githubUrl || '',
-    liveUrl: data.liveUrl || '',
+    githubUrl: typeof data.githubUrl === 'string' ? data.githubUrl.trim() : '',
+    liveDemoUrl:
+      typeof data.liveDemoUrl === 'string' && data.liveDemoUrl.trim()
+        ? data.liveDemoUrl.trim()
+        : typeof data.liveUrl === 'string'
+        ? data.liveUrl.trim()
+        : '',
+    liveUrl:
+      typeof data.liveDemoUrl === 'string' && data.liveDemoUrl.trim()
+        ? data.liveDemoUrl.trim()
+        : typeof data.liveUrl === 'string'
+        ? data.liveUrl.trim()
+        : '',
     likes: typeof data.likes === 'number' ? data.likes : 0,
     commentsCount: typeof data.commentsCount === 'number' ? data.commentsCount : 0,
     authorId: data.authorId || '',
@@ -1402,8 +1413,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         description: projectData.description.trim().slice(0, 2000),
         category: projectData.category || 'Web Dev',
         techStack: Array.isArray(projectData.techStack) ? projectData.techStack.slice(0, 20) : [],
-        githubUrl: projectData.githubUrl || '',
-        liveUrl: projectData.liveUrl || '',
+        githubUrl: (projectData.githubUrl || '').trim(),
+        liveDemoUrl: (projectData.liveDemoUrl || projectData.liveUrl || '').trim(),
+        liveUrl: (projectData.liveDemoUrl || projectData.liveUrl || '').trim(),
         likes: 1,
         commentsCount: 0,
         authorId: currentUser.id,
@@ -1453,8 +1465,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (updates.requiredSkills !== undefined) payload.requiredSkills = updates.requiredSkills;
     if (updates.lookingForTeammates !== undefined)
       payload.lookingForTeammates = updates.lookingForTeammates;
-    if (updates.githubUrl !== undefined) payload.githubUrl = updates.githubUrl;
-    if (updates.liveUrl !== undefined) payload.liveUrl = updates.liveUrl;
+    if (updates.githubUrl !== undefined) payload.githubUrl = (updates.githubUrl || '').trim();
+    if (updates.liveDemoUrl !== undefined || updates.liveUrl !== undefined) {
+      const resolvedDemo = (updates.liveDemoUrl ?? updates.liveUrl ?? '').trim();
+      payload.liveDemoUrl = resolvedDemo;
+      payload.liveUrl = resolvedDemo;
+    }
     if (updates.files !== undefined) payload.files = updates.files;
     if (updates.tasks !== undefined) payload.tasks = updates.tasks;
     if (updates.milestones !== undefined) payload.milestones = updates.milestones;

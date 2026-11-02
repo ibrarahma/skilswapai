@@ -70,6 +70,7 @@ export const Sidebar: React.FC = () => {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const labelAlreadyContainsAi = /\bAI\b/i.test(item.label);
           return (
             <button
               key={item.id}
@@ -88,7 +89,7 @@ export const Sidebar: React.FC = () => {
                 />
                 <span>{item.label}</span>
               </div>
-              {item.isAi && !isActive && (
+              {item.isAi && !labelAlreadyContainsAi && !isActive && (
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
                   AI
                 </span>
