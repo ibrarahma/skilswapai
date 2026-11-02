@@ -20,9 +20,17 @@ interface MentorshipRequest {
 }
 
 export const TeacherDashboardView: React.FC = () => {
-  const { currentUser, projects, setActiveTab, setSelectedUserProfile, users, sendChatMessage } = useApp();
-
-  const [mentorshipRequests, setMentorshipRequests] = useState<MentorshipRequest[]>([]);
+  const {
+    currentUser,
+    projects,
+    setActiveTab,
+    setSelectedUserProfile,
+    users,
+    connectionRequests,
+    acceptConnectionRequest,
+    rejectConnectionRequest,
+    openDirectChat,
+  } = useApp();
 
   const [noticeInput, setNoticeInput] = useState('');
   const [notices, setNotices] = useState([
@@ -42,11 +50,14 @@ export const TeacherDashboardView: React.FC = () => {
 
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
 
-  const handleAcceptRequest = (id: string, studentName: string) => {
-    setMentorshipRequests(prev =>
-      prev.map(r => (r.id === id ? { ...r, status: 'accepted' } : r))
-    );
-    setFeedbackToast(`Mentorship request for ${studentName} accepted. Session scheduled.`);
+  const incomingConnectionRequests = connectionRequests.filter(
+    (c) => c.receiverUid === currentUser.id && c.status === 'Pending'
+  );
+  const acceptedConnections = connectionRequests.filter((c) => c.status === 'Accepted');
+
+  const handleAcceptRequest = async (id: string, studentName: string) => {
+    await acceptConnectionRequest(id);
+    setFeedbackToast(`Connection request from ${studentName} accepted. Direct messaging enabled.`);
     setTimeout(() => setFeedbackToast(null), 4000);
   };
 
@@ -131,8 +142,8 @@ export const TeacherDashboardView: React.FC = () => {
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">18</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Mentees Guided</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{acceptedConnections.length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Connected Students</div>
           </div>
         </div>
 
@@ -142,7 +153,7 @@ export const TeacherDashboardView: React.FC = () => {
           </div>
           <div>
             <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{projects.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Active Capstones</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Published Capstones</div>
           </div>
         </div>
 
@@ -161,8 +172,8 @@ export const TeacherDashboardView: React.FC = () => {
             <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">6</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Sessions Scheduled</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{incomingConnectionRequests.length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Pending Requests</div>
           </div>
         </div>
       </div>
@@ -170,27 +181,27 @@ export const TeacherDashboardView: React.FC = () => {
       {/* Main Grid: Mentorship Queue & Hardware Lab */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left Column (2 Cols): Mentorship Requests */}
+        {/* Left Column (2 Cols): Mentorship & Connection Requests */}
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100">
-                  Student Mentorship & Capstone Inquiries
+                  Student Connection & Mentorship Requests
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Direct requests from departmental students seeking faculty advice
+                  Direct connection requests from students seeking faculty guidance
                 </p>
               </div>
               <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                {mentorshipRequests.filter(r => r.status === 'pending').length} Pending
+                {incomingConnectionRequests.length} Pending
               </span>
             </div>
 
-            {mentorshipRequests.length === 0 ? (
+            {incomingConnectionRequests.length === 0 ? (
               <div className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-center space-y-2">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  No pending student mentorship requests at the moment.
+                  No pending student connection requests at the moment.
                 </p>
                 {users.filter(u => u.id !== currentUser.id && u.role === 'student').length > 0 && (
                   <div className="pt-3 border-t border-slate-200/60 dark:border-slate-700/60 text-left space-y-2">
@@ -220,65 +231,60 @@ export const TeacherDashboardView: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {mentorshipRequests.map(req => (
-                  <div
-                    key={req.id}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-3"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={req.studentAvatar}
-                          alt={req.studentName}
-                          className="w-10 h-10 rounded-full object-cover border border-purple-500"
-                        />
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                            {req.studentName}
-                          </h4>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {req.department} · {req.semester} · {req.college}
-                          </p>
+                {incomingConnectionRequests.map(req => {
+                  const senderProfile = users.find(u => u.id === req.senderUid);
+                  return (
+                    <div
+                      key={req.id}
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={req.senderAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(req.senderName)}`}
+                            alt={req.senderName}
+                            className="w-10 h-10 rounded-full object-cover border border-purple-500"
+                          />
+                          <div>
+                            <h4
+                              onClick={() => senderProfile && setSelectedUserProfile(senderProfile)}
+                              className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-purple-600 cursor-pointer"
+                            >
+                              {req.senderName}
+                            </h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              @{req.senderUsername} · {req.senderDepartment} · {req.senderCollege}
+                            </p>
+                          </div>
                         </div>
+                        <span className="text-[10px] text-amber-600 font-semibold">Pending</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">{req.date}</span>
-                    </div>
 
-                    <div>
-                      <span className="inline-block px-2.5 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 text-[11px] font-bold mb-1">
-                        Topic: {req.topic}
-                      </span>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                        "{req.message}"
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                      <span className={`text-[11px] font-semibold ${
-                        req.status === 'accepted' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-                      }`}>
-                        {req.status === 'accepted' ? '✓ Accepted & Scheduled' : 'Pending Review'}
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        {req.status === 'pending' && (
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                        <button
+                          onClick={() => handleAcceptRequest(req.id, req.senderName)}
+                          className="px-3 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all cursor-pointer"
+                        >
+                          Accept Connection
+                        </button>
+                        <button
+                          onClick={() => rejectConnectionRequest(req.id)}
+                          className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 text-xs font-semibold transition-all cursor-pointer"
+                        >
+                          Decline
+                        </button>
+                        {senderProfile && (
                           <button
-                            onClick={() => handleAcceptRequest(req.id, req.studentName)}
-                            className="px-3 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all cursor-pointer"
+                            onClick={() => openDirectChat(senderProfile)}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
                           >
-                            Accept Mentorship
+                            Message Student
                           </button>
                         )}
-                        <button
-                          onClick={() => setActiveTab('chat')}
-                          className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
-                        >
-                          Message Student
-                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

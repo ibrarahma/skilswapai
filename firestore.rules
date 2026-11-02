@@ -59,10 +59,48 @@ service cloud.firestore {
         && request.resource.data.name.size() <= 100
       ) || isAdmin();
 
-      allow delete: if isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
-    // 3. Skill Listings collection
+    // 3. Student-Teacher & Peer Connection Requests collection
+    match /connectionRequests/{requestId} {
+      allow get: if isSignedIn() && (
+        resource == null ||
+        resource.data.senderUid == request.auth.uid ||
+        resource.data.receiverUid == request.auth.uid ||
+        (resource.data.participants is list && request.auth.uid in resource.data.participants) ||
+        isAdmin()
+      );
+      allow list: if isSignedIn() && (
+        resource.data.senderUid == request.auth.uid ||
+        resource.data.receiverUid == request.auth.uid ||
+        (resource.data.participants is list && request.auth.uid in resource.data.participants) ||
+        isAdmin()
+      );
+      allow create: if isSignedIn()
+        && isValidId(requestId)
+        && request.resource.data.senderUid == request.auth.uid
+        && request.resource.data.receiverUid is string
+        && request.resource.data.receiverUid != request.auth.uid
+        && request.resource.data.participants is list
+        && request.resource.data.participants.size() == 2
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.status == 'Pending';
+      allow update: if isSignedIn() && (
+        resource.data.senderUid == request.auth.uid ||
+        resource.data.receiverUid == request.auth.uid ||
+        isAdmin()
+      ) && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.receiverUid == resource.data.receiverUid
+        && request.resource.data.status in ['Pending', 'Accepted', 'Rejected'];
+      allow delete: if isSignedIn() && (
+        resource.data.senderUid == request.auth.uid ||
+        resource.data.receiverUid == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // 4. Skill Listings collection
     match /skillListings/{listingId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
@@ -78,16 +116,18 @@ service cloud.firestore {
       allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // 4. Exchange Requests collection
+    // 5. Exchange Requests collection
     match /exchangeRequests/{requestId} {
       allow get: if isSignedIn() && (
         resource.data.senderUid == request.auth.uid ||
         resource.data.receiverUid == request.auth.uid ||
+        (resource.data.participants is list && request.auth.uid in resource.data.participants) ||
         isAdmin()
       );
       allow list: if isSignedIn() && (
         resource.data.senderUid == request.auth.uid ||
         resource.data.receiverUid == request.auth.uid ||
+        (resource.data.participants is list && request.auth.uid in resource.data.participants) ||
         isAdmin()
       );
       allow create: if isSignedIn()
@@ -104,47 +144,115 @@ service cloud.firestore {
         && request.resource.data.requestedSkill.size() <= 120;
       allow update: if isSignedIn() && (
         resource.data.senderUid == request.auth.uid ||
-        resource.data.receiverUid == request.auth.uid
+        resource.data.receiverUid == request.auth.uid ||
+        isAdmin()
       ) && request.resource.data.senderUid == resource.data.senderUid
         && request.resource.data.receiverUid == resource.data.receiverUid
         && request.resource.data.status in ['Pending', 'Accepted', 'Rejected', 'Cancelled', 'Completed'];
-      allow delete: if isAdmin();
+      allow delete: if isSignedIn() && (
+        resource.data.senderUid == request.auth.uid ||
+        resource.data.receiverUid == request.auth.uid ||
+        isAdmin()
+      );
     }
 
-    // 5. Chats & Messages (Participant-only access)
+    // Helper to verify whether the current user is one of the two UIDs in a direct chat ID (dm_<uid1>_<uid2>)
+    function isDirectChatMemberById(chatId) {
+      return chatId.matches('^dm_[a-zA-Z0-9]+_[a-zA-Z0-9]+$') &&
+        request.auth.uid in chatId.split('_');
+    }
+
+    function isDocChatParticipant(chatData) {
+      return chatData != null && (
+        ('participants' in chatData && chatData.participants is list && request.auth.uid in chatData.participants) ||
+        ('members' in chatData && chatData.members is list && request.auth.uid in chatData.members)
+      );
+    }
+
+    // Helper to safely verify chat participation without null dereference or redundant get() calls
+    function isChatParticipant(chatId) {
+      return isDirectChatMemberById(chatId) || (
+        exists(/databases/$(database)/documents/chats/$(chatId)) &&
+        isDocChatParticipant(get(/databases/$(database)/documents/chats/$(chatId)).data)
+      );
+    }
+
+    // 6. Chats & Messages (Participant-only access)
     match /chats/{chatId} {
-      allow get: if isSignedIn() && (request.auth.uid in resource.data.participants || isAdmin());
-      allow list: if isSignedIn() && (request.auth.uid in resource.data.participants || isAdmin());
+      allow get: if isSignedIn() && (
+        resource == null ||
+        isDirectChatMemberById(chatId) ||
+        isDocChatParticipant(resource.data) ||
+        isAdmin()
+      );
+      allow list: if isSignedIn() && (
+        request.auth.uid in resource.data.participants ||
+        isDirectChatMemberById(chatId) ||
+        isDocChatParticipant(resource.data) ||
+        isAdmin()
+      );
       allow create: if isSignedIn()
         && isValidId(chatId)
         && request.resource.data.participants is list
         && request.resource.data.participants.size() >= 1
         && request.resource.data.participants.size() <= 50
         && request.auth.uid in request.resource.data.participants;
-      allow update: if isSignedIn() && request.auth.uid in resource.data.participants;
-      allow delete: if isAdmin();
+      allow update: if isSignedIn() && (
+        isDirectChatMemberById(chatId) ||
+        isDocChatParticipant(resource.data) ||
+        (request.resource.data.participants is list && request.auth.uid in request.resource.data.participants) ||
+        isAdmin()
+      );
+      allow delete: if isSignedIn() && (
+        isDirectChatMemberById(chatId) ||
+        isDocChatParticipant(resource.data) ||
+        isAdmin()
+      );
 
       match /messages/{messageId} {
-        allow read: if isSignedIn() && (
-          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants ||
+        allow get, list: if isSignedIn() && (
+          isDirectChatMemberById(chatId) ||
+          isChatParticipant(chatId) ||
+          ('participants' in resource.data && request.auth.uid in resource.data.participants) ||
+          resource.data.senderUid == request.auth.uid ||
+          ('receiverUid' in resource.data && resource.data.receiverUid == request.auth.uid) ||
           isAdmin()
         );
         allow create: if isSignedIn()
           && isValidId(messageId)
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
           && request.resource.data.senderUid == request.auth.uid
           && request.resource.data.text is string
           && request.resource.data.text.size() >= 1
-          && request.resource.data.text.size() <= 2000;
+          && request.resource.data.text.size() <= 2000
+          && (
+            isDirectChatMemberById(chatId) ||
+            isChatParticipant(chatId) ||
+            ('participants' in request.resource.data &&
+              request.resource.data.participants is list &&
+              request.auth.uid in request.resource.data.participants) ||
+            isAdmin()
+          );
         allow update: if isSignedIn()
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+          && (
+            isDirectChatMemberById(chatId) ||
+            isChatParticipant(chatId) ||
+            ('participants' in resource.data && request.auth.uid in resource.data.participants) ||
+            resource.data.senderUid == request.auth.uid ||
+            ('receiverUid' in resource.data && resource.data.receiverUid == request.auth.uid) ||
+            isAdmin()
+          )
           && request.resource.data.senderUid == resource.data.senderUid
           && request.resource.data.text == resource.data.text;
-        allow delete: if isAdmin();
+        allow delete: if isSignedIn() && (
+          resource.data.senderUid == request.auth.uid ||
+          isDirectChatMemberById(chatId) ||
+          isChatParticipant(chatId) ||
+          isAdmin()
+        );
       }
     }
 
-    // 6. Mentoring & Learning Sessions
+    // 7. Mentoring & Learning Sessions
     match /sessions/{sessionId} {
       allow get, list: if isSignedIn() && (
         resource.data.hostUid == request.auth.uid ||
@@ -167,9 +275,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // 7. Projects & Project Invitations
+    // 8. Projects & Project Invitations
     match /projects/{projectId} {
-      allow read: if isSignedIn();
+      allow get, list: if isSignedIn() && (
+        !('visibility' in resource.data) ||
+        resource.data.visibility == 'public' ||
+        resource.data.authorId == request.auth.uid ||
+        (resource.data.teamMembers is list && request.auth.uid in resource.data.teamMembers) ||
+        isAdmin()
+      );
       allow create: if isSignedIn()
         && isValidId(projectId)
         && request.resource.data.authorId == request.auth.uid
@@ -182,6 +296,7 @@ service cloud.firestore {
       allow update: if isSignedIn() && (
         resource.data.authorId == request.auth.uid ||
         (resource.data.teamMembers is list && request.auth.uid in resource.data.teamMembers) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'upvotedBy', 'updatedAt']) ||
         isAdmin()
       ) && request.resource.data.authorId == resource.data.authorId;
       allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
@@ -206,7 +321,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // 8. Learning Resources
+    // 9. Learning Resources
     match /resources/{resourceId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
@@ -224,7 +339,7 @@ service cloud.firestore {
       allow delete: if isSignedIn() && (resource.data.authorUid == request.auth.uid || isAdmin());
     }
 
-    // 9. Notifications (Recipient-only read & mark read; any signed-in user can trigger notification creation)
+    // 10. Notifications (Recipient-only read & mark read; any signed-in user can trigger notification creation)
     match /notifications/{notificationId} {
       allow get, list: if isSignedIn() && (
         resource.data.recipientUid == request.auth.uid || isAdmin()
@@ -244,7 +359,7 @@ service cloud.firestore {
       allow delete: if isSignedIn() && (resource.data.recipientUid == request.auth.uid || isAdmin());
     }
 
-    // 10. Moderation Reports (Reporters can create; only Admins can review/manage)
+    // 11. Moderation Reports (Reporters can create; only Admins can review/manage)
     match /reports/{reportId} {
       allow get, list: if isAdmin() || (isSignedIn() && resource.data.reporterUid == request.auth.uid);
       allow create: if isSignedIn()

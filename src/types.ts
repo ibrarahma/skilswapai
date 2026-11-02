@@ -53,11 +53,16 @@ export interface ProjectItem {
   commentsCount: number;
   authorId: string;
   authorName: string;
+  authorUsername?: string;
   authorAvatar: string;
   authorRole: string;
   college: string;
+  department?: string;
   createdAt: string;
+  updatedAt?: string;
   status: 'Idea' | 'In Progress' | 'Completed';
+  visibility?: 'public' | 'private';
+  published?: boolean;
   lookingForTeammates?: boolean;
   requiredSkills?: string[];
   teamMembers?: string[];
@@ -65,6 +70,28 @@ export interface ProjectItem {
   milestones?: ProjectMilestone[];
   files?: ProjectFile[];
   upvotedBy?: string[];
+}
+
+export interface ConnectionRequest {
+  id: string;
+  senderUid: string;
+  senderName: string;
+  senderUsername: string;
+  senderAvatar: string;
+  senderRole: UserRole;
+  senderCollege: string;
+  senderDepartment: string;
+  receiverUid: string;
+  receiverName: string;
+  receiverUsername: string;
+  receiverAvatar: string;
+  receiverRole: UserRole;
+  receiverCollege: string;
+  receiverDepartment: string;
+  participants: string[];
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProjectInvitation {
@@ -103,6 +130,7 @@ export interface ProjectFile {
   size: string;
   uploadedAt: string;
   url: string;
+  type?: string;
 }
 
 export interface UserProfile {
@@ -325,9 +353,11 @@ export interface ChatMessage {
   senderAvatar: string;
   text: string;
   timestamp: string;
+  createdAt?: string;
   readBy?: string[];
   type?: 'text' | 'file' | 'voice';
   fileUrl?: string;
+  fileName?: string;
   audioDuration?: string;
 }
 
@@ -337,10 +367,15 @@ export interface ChatChannel {
   type: 'direct' | 'group';
   members: string[];
   avatar?: string;
+  peerUid?: string;
+  peerUsername?: string;
+  peerRole?: UserRole;
+  peerCollege?: string;
   projectId?: string;
   lastMessage?: string;
   lastMessageTime?: string;
   unreadCount?: number;
+  updatedAt?: string;
 }
 
 export interface NotificationItem {

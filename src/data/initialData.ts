@@ -19,66 +19,10 @@ export const KNOWN_DEMO_EMAILS = new Set([
   'admin.dean@iitd.ac.in',
 ]);
 
-// Fake/demo student accounts have been isolated and removed from active user listings.
-// Genuine users are loaded directly from Cloud Firestore (/users collection).
+// Genuine users, projects, chats, and notifications are loaded directly from Cloud Firestore.
 export const INITIAL_USERS: UserProfile[] = [];
 
-export const INITIAL_PROJECTS: ProjectItem[] = [
-  {
-    id: 'proj_1',
-    title: 'CodeSync - Realtime Collaborative IDE for Campus Teams',
-    description: 'A browser-based collaborative code editor with video chat, AI auto-complete, and instant sandbox execution for college hackathons and group projects.',
-    techStack: ['Next.js', 'WebSockets', 'Monaco Editor', 'Node.js', 'Docker', 'Tailwind CSS'],
-    category: 'Web Dev',
-    githubUrl: 'https://github.com/skillswap-campus/codesync',
-    liveUrl: 'https://codesync-demo.vercel.app',
-    likes: 12,
-    commentsCount: 3,
-    authorId: 'campus_showcase_1',
-    authorName: 'MANUU ECE Innovation Lab',
-    authorAvatar: 'https://ui-avatars.com/api/?name=ECE+Lab&background=4f46e5&color=fff',
-    authorRole: 'student',
-    college: 'MANUU, Hyderabad',
-    createdAt: '2 days ago',
-    status: 'In Progress',
-    lookingForTeammates: true,
-    requiredSkills: ['DevOps / Docker', 'Embedded C', 'Frontend UI'],
-    upvotedBy: [],
-    tasks: [
-      { id: 't1', title: 'Implement WebSocket operational transformation logic', status: 'done', assignee: 'Project Lead' },
-      { id: 't2', title: 'Add dark theme syntax highlighting presets', status: 'in_progress', assignee: 'Frontend Team' },
-      { id: 't3', title: 'Containerize code execution engine sandbox', status: 'todo', assignee: 'Unassigned' }
-    ],
-    milestones: [
-      { id: 'm1', title: 'Alpha Release & Campus Beta Test', dueDate: '2026-08-15', completed: true },
-      { id: 'm2', title: 'Multi-language Execution Engine', dueDate: '2026-09-01', completed: false }
-    ],
-    files: [
-      { id: 'f1', name: 'CodeSync_Architecture_Diagram.pdf', size: '2.4 MB', uploadedAt: 'Yesterday', url: '#' },
-      { id: 'f2', name: 'UI_Wireframes_v2.fig', size: '14.1 MB', uploadedAt: '3 days ago', url: '#' }
-    ]
-  },
-  {
-    id: 'proj_2',
-    title: 'CampuShare - Peer-to-Peer Book & Hardware Gear Exchange',
-    description: 'Hyper-local college marketplace where students list unused textbooks, lab gear, and microcontrollers for free skill swap or nominal rental.',
-    techStack: ['React', 'Firebase', 'Express', 'Tailwind CSS'],
-    category: 'Mobile App',
-    githubUrl: 'https://github.com/skillswap-campus/campushare',
-    likes: 18,
-    commentsCount: 4,
-    authorId: 'campus_showcase_2',
-    authorName: 'ECE Hardware Club',
-    authorAvatar: 'https://ui-avatars.com/api/?name=Hardware+Club&background=7c3aed&color=fff',
-    authorRole: 'student',
-    college: 'MANUU, Hyderabad',
-    createdAt: '1 week ago',
-    status: 'In Progress',
-    lookingForTeammates: true,
-    requiredSkills: ['UI Design', 'Firebase Firestore', 'IoT Sensors'],
-    upvotedBy: []
-  }
-];
+export const INITIAL_PROJECTS: ProjectItem[] = [];
 
 export const INITIAL_HACKATHONS: Hackathon[] = [
   {
@@ -197,61 +141,9 @@ export const INITIAL_POLLS: Poll[] = [
   }
 ];
 
-export const INITIAL_CHAT_CHANNELS: ChatChannel[] = [
-  {
-    id: 'chan_1',
-    name: 'MANUU ECE General Lounge',
-    type: 'group',
-    members: [],
-    avatar: 'https://ui-avatars.com/api/?name=MANUU+ECE&background=4f46e5&color=fff',
-    lastMessage: 'Welcome to the SkillSwap AI campus collaboration channel!',
-    lastMessageTime: 'Today',
-    unreadCount: 0
-  },
-  {
-    id: 'chan_2',
-    name: 'Hackathon & Project Builders 🚀',
-    type: 'group',
-    members: [],
-    avatar: 'https://ui-avatars.com/api/?name=Project+Builders&background=7c3aed&color=fff',
-    lastMessage: 'Share your project ideas and find teammates here.',
-    lastMessageTime: 'Today',
-    unreadCount: 0
-  }
-];
+// Placeholder example conversations removed; conversations and messages are synced in real time from Firestore (/chats)
+export const INITIAL_CHAT_CHANNELS: ChatChannel[] = [];
 
-export const INITIAL_CHAT_MESSAGES: Record<string, ChatMessage[]> = {
-  chan_1: [
-    {
-      id: 'm1',
-      channelId: 'chan_1',
-      senderId: 'system_welcome',
-      senderName: 'SkillSwap AI Campus Bot',
-      senderAvatar: 'https://ui-avatars.com/api/?name=SkillSwap+AI&background=4f46e5&color=fff',
-      text: 'Welcome to the MANUU ECE General Lounge! Connect with genuine students and faculty mentors here.',
-      timestamp: '09:00 AM'
-    }
-  ],
-  chan_2: [
-    {
-      id: 'm2',
-      channelId: 'chan_2',
-      senderId: 'system_welcome',
-      senderName: 'SkillSwap AI Campus Bot',
-      senderAvatar: 'https://ui-avatars.com/api/?name=SkillSwap+AI&background=7c3aed&color=fff',
-      text: 'Looking for hackathon teammates or hardware components? Post your requirements in this group!',
-      timestamp: '09:05 AM'
-    }
-  ]
-};
+export const INITIAL_CHAT_MESSAGES: Record<string, ChatMessage[]> = {};
 
-export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'n1',
-    title: 'Welcome to SkillSwap AI!',
-    message: 'Complete your skills profile in Settings to match with genuine peers and faculty mentors.',
-    time: 'Just now',
-    read: false,
-    type: 'admin'
-  }
-];
+export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];

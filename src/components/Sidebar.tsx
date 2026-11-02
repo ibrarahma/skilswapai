@@ -1,29 +1,62 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import {
-  LayoutDashboard, ArrowLeftRight, Users, FolderKanban,
-  Trophy, Sparkles, Send, Settings, School
+  LayoutDashboard,
+  ArrowLeftRight,
+  Users,
+  FolderKanban,
+  Trophy,
+  Sparkles,
+  Send,
+  Settings,
+  School,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, chatChannels, swapRequests, currentUser } = useApp();
+  const {
+    activeTab,
+    setActiveTab,
+    chatChannels,
+    swapRequests,
+    connectionRequests,
+    currentUser,
+  } = useApp();
 
   const isTeacher = currentUser.role === 'teacher';
-  const pendingSwapsCount = swapRequests.filter(s => s.status === 'pending').length;
+
+  // Real pending incoming skill exchange requests + incoming connection requests for the current user
+  const incomingPendingSwapsCount = swapRequests.filter(
+    (s) => s.receiverId === currentUser.id && s.status === 'pending'
+  ).length;
+  const incomingPendingConnectionsCount = connectionRequests.filter(
+    (c) => c.receiverUid === currentUser.id && c.status === 'Pending'
+  ).length;
+  const totalSkillsActionBadge = incomingPendingSwapsCount + incomingPendingConnectionsCount;
+
   const unreadChatCount = chatChannels.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
   const navItems = [
     {
       id: 'dashboard',
       label: isTeacher ? 'Teacher Dashboard' : 'Student Dashboard',
-      icon: isTeacher ? School : LayoutDashboard
+      icon: isTeacher ? School : LayoutDashboard,
     },
-    { id: 'skills', label: 'Skills Exchange', icon: ArrowLeftRight, badge: pendingSwapsCount > 0 ? pendingSwapsCount : undefined },
+    {
+      id: 'skills',
+      label: 'Skills Exchange',
+      icon: ArrowLeftRight,
+      badge: totalSkillsActionBadge > 0 ? totalSkillsActionBadge : undefined,
+    },
     { id: 'ai-team', label: 'AI Team Finder', icon: Users, isAi: true },
     { id: 'projects', label: 'Project Hub', icon: FolderKanban },
     { id: 'hackathons', label: 'Hackathons', icon: Trophy },
     { id: 'ai-career', label: 'AI Career Suite', icon: Sparkles, isAi: true },
-    { id: 'chat', label: 'Messages & Chat', icon: Send, badge: unreadChatCount > 0 ? unreadChatCount : undefined },
+    {
+      id: 'chat',
+      label: 'Messages & Chat',
+      icon: Send,
+      badge: unreadChatCount > 0 ? unreadChatCount : undefined,
+    },
     { id: 'settings', label: 'Settings & Account', icon: Settings },
   ];
 
@@ -41,14 +74,18 @@ export const Sidebar: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 isActive
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 font-semibold'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.isAi ? 'text-purple-500' : 'text-slate-400'}`} />
+                <Icon
+                  className={`w-4 h-4 ${
+                    isActive ? 'text-white' : item.isAi ? 'text-purple-500' : 'text-slate-400'
+                  }`}
+                />
                 <span>{item.label}</span>
               </div>
               {item.isAi && !isActive && (
@@ -57,9 +94,11 @@ export const Sidebar: React.FC = () => {
                 </span>
               )}
               {item.badge !== undefined && item.badge > 0 && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isActive ? 'bg-white text-indigo-700' : 'bg-rose-500 text-white'
-                }`}>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    isActive ? 'bg-white text-indigo-700' : 'bg-rose-500 text-white'
+                  }`}
+                >
                   {item.badge}
                 </span>
               )}
@@ -77,7 +116,7 @@ export const Sidebar: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition-all ${
+              className={`relative flex flex-col items-center justify-center p-1.5 rounded-xl transition-all ${
                 isActive
                   ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                   : 'text-slate-500 dark:text-slate-400'
@@ -85,6 +124,11 @@ export const Sidebar: React.FC = () => {
             >
               <Icon className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">{item.label.split(' ')[0]}</span>
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className="absolute top-0.5 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
             </button>
           );
         })}

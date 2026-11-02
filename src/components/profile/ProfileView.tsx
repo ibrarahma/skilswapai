@@ -4,9 +4,25 @@ import { db, handleFirestoreError, OperationType } from '../../lib/firebase';
 import { useApp } from '../../context/AppContext';
 import { UserSkill } from '../../types';
 import {
-  X, GraduationCap, School, Github, Linkedin, Globe,
-  ShieldCheck, Award, Star, Sparkles, Send, ArrowLeftRight,
-  Check, Plus, Settings, BookOpen, Calendar
+  X,
+  GraduationCap,
+  School,
+  Github,
+  Linkedin,
+  Globe,
+  ShieldCheck,
+  Award,
+  Star,
+  Send,
+  ArrowLeftRight,
+  Check,
+  Plus,
+  Settings,
+  BookOpen,
+  UserPlus,
+  UserCheck,
+  UserX,
+  Clock,
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
@@ -16,6 +32,13 @@ export const ProfileView: React.FC = () => {
     currentUser,
     setCurrentUser,
     sendSwapRequest,
+    connectionRequests,
+    sendConnectionRequest,
+    acceptConnectionRequest,
+    rejectConnectionRequest,
+    cancelConnectionRequest,
+    removeConnection,
+    openDirectChat,
     setActiveTab,
     setUsers,
   } = useApp();
@@ -41,6 +64,13 @@ export const ProfileView: React.FC = () => {
   const isSelf = selectedUserProfile.id === currentUser.id;
   const profileData = isSelf ? currentUser : selectedUserProfile;
   const isTeacher = profileData.role === 'teacher';
+
+  // Connection state between currentUser and profileData
+  const existingConnection = connectionRequests.find(
+    (c) =>
+      (c.senderUid === currentUser.id && c.receiverUid === profileData.id) ||
+      (c.senderUid === profileData.id && c.receiverUid === currentUser.id)
+  );
 
   const handleSaveProfile = async () => {
     const nextBio = editedBio.trim() || currentUser.bio;
@@ -121,14 +151,19 @@ export const ProfileView: React.FC = () => {
     }
   };
 
-  const handleSendSwapSubmit = (e: React.FormEvent) => {
+  const handleSendSwapSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    sendSwapRequest(profileData.id, swapTeachSkill, swapLearnSkill, swapMessage);
+    await sendSwapRequest(profileData.id, swapTeachSkill, swapLearnSkill, swapMessage);
     setSwapSuccess(true);
     setTimeout(() => {
       setSwapSuccess(false);
       setSwapModalOpen(false);
     }, 1200);
+  };
+
+  const handleStartDirectMessage = async () => {
+    setSelectedUserProfile(null);
+    await openDirectChat(profileData);
   };
 
   return (
@@ -143,7 +178,7 @@ export const ProfileView: React.FC = () => {
       <div className="min-h-full w-full flex items-start justify-center p-3 sm:p-6 md:py-10">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full shadow-2xl relative overflow-hidden mb-16 md:mb-8">
           
-          {/* Top Gradient Banner */}
+          {/* Top Gradient Cover Banner */}
           <div className="h-28 sm:h-36 w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 relative">
             <button
               type="button"
@@ -158,76 +193,30 @@ export const ProfileView: React.FC = () => {
           {/* Profile Body Container */}
           <div className="px-5 sm:px-8 pb-6 sm:pb-8">
             
-            {/* Header Row: Avatar + Name/Institution + Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-14 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex flex-col sm:flex-row sm:items-end gap-4 min-w-0">
+            {/* Row 1: Avatar overlapping cover edge + Action Buttons below cover */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="-mt-12 sm:-mt-14 shrink-0">
                 <img
                   src={
                     profileData.avatar ||
                     `https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name || 'User')}`
                   }
                   alt={profileData.name}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white dark:border-slate-900 object-cover shadow-xl bg-white dark:bg-slate-800 shrink-0"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white dark:border-slate-900 object-cover shadow-xl bg-white dark:bg-slate-800"
                 />
-
-                <div className="min-w-0 pt-1 sm:pb-1 space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 break-words">
-                      {profileData.name}
-                    </h2>
-                    {profileData.verificationStatus === 'verified' && (
-                      <span
-                        className="p-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0"
-                        title="Verified Account"
-                      >
-                        <ShieldCheck className="w-4 h-4" />
-                      </span>
-                    )}
-                    <span
-                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                        isTeacher
-                          ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
-                          : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
-                      }`}
-                    >
-                      {isTeacher ? (
-                        <School className="w-3 h-3" />
-                      ) : (
-                        <GraduationCap className="w-3 h-3" />
-                      )}
-                      <span>{isTeacher ? 'Teacher / Professor' : 'Student'}</span>
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
-                    <GraduationCap className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                    <span className="break-words">
-                      {profileData.college || profileData.institution || 'MANUU, Hyderabad'}
-                      {profileData.department ? ` • ${profileData.department}` : ''}
-                    </span>
-                  </p>
-
-                  {isTeacher && profileData.designation ? (
-                    <p className="text-[11px] text-purple-600 dark:text-purple-400 font-semibold">
-                      {profileData.designation}
-                    </p>
-                  ) : !isTeacher && profileData.semester ? (
-                    <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
-                      Semester {profileData.semester}
-                    </p>
-                  ) : null}
-                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {/* Action Buttons (always cleanly below the gradient banner) */}
+              <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-3">
                 {isSelf ? (
                   <>
                     <button
                       type="button"
                       onClick={() => {
                         setEditedBio(profileData.bio || '');
-                        setEditedAvailability(profileData.availabilityStatus || 'Available for Projects');
+                        setEditedAvailability(
+                          profileData.availabilityStatus || 'Available for Projects'
+                        );
                         setIsEditing(!isEditing);
                       }}
                       className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
@@ -248,6 +237,58 @@ export const ProfileView: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    {/* Connection Status Control */}
+                    {!existingConnection || existingConnection.status === 'Rejected' ? (
+                      <button
+                        type="button"
+                        onClick={() => sendConnectionRequest(profileData)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Connect</span>
+                      </button>
+                    ) : existingConnection.status === 'Pending' &&
+                      existingConnection.senderUid === currentUser.id ? (
+                      <button
+                        type="button"
+                        onClick={() => cancelConnectionRequest(existingConnection.id)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-semibold transition-all cursor-pointer"
+                        title="Click to cancel connection request"
+                      >
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>Request Sent (Cancel)</span>
+                      </button>
+                    ) : existingConnection.status === 'Pending' &&
+                      existingConnection.receiverUid === currentUser.id ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => acceptConnectionRequest(existingConnection.id)}
+                          className="flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm cursor-pointer"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Accept</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => rejectConnectionRequest(existingConnection.id)}
+                          className="flex items-center gap-1 px-2.5 py-2 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 text-xs font-semibold cursor-pointer"
+                        >
+                          <UserX className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => removeConnection(profileData.id)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold cursor-pointer"
+                        title="Click to remove connection"
+                      >
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Connected</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => {
@@ -255,25 +296,77 @@ export const ProfileView: React.FC = () => {
                         setSwapLearnSkill(profileData.skillsToTeach[0]?.name || 'Embedded Systems');
                         setSwapModalOpen(true);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 hover:opacity-95 transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 hover:opacity-95 transition-all cursor-pointer"
                     >
-                      <ArrowLeftRight className="w-4 h-4" />
-                      <span>Request Skill Swap</span>
+                      <ArrowLeftRight className="w-3.5 h-3.5" />
+                      <span>Swap Skill</span>
                     </button>
+
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedUserProfile(null);
-                        setActiveTab('chat');
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all cursor-pointer"
+                      onClick={handleStartDirectMessage}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all cursor-pointer"
                     >
-                      <Send className="w-4 h-4" />
+                      <Send className="w-3.5 h-3.5" />
                       <span>Message</span>
                     </button>
                   </>
                 )}
               </div>
+            </div>
+
+            {/* Row 2: Name, @username, Role Badge, Institution, and Department (100% below gradient cover, zero overlap) */}
+            <div className="mt-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 break-words">
+                  {profileData.name}
+                </h2>
+                {profileData.verificationStatus === 'verified' && (
+                  <span
+                    className="p-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0"
+                    title="Verified Account"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                  </span>
+                )}
+                <span
+                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                    isTeacher
+                      ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
+                      : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
+                  }`}
+                >
+                  {isTeacher ? (
+                    <School className="w-3 h-3" />
+                  ) : (
+                    <GraduationCap className="w-3 h-3" />
+                  )}
+                  <span>{isTeacher ? 'Teacher / Professor' : 'Student'}</span>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400">
+                <span className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">
+                  @{profileData.username || profileData.id.slice(0, 8)}
+                </span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300 break-words">
+                  <GraduationCap className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  {profileData.college || profileData.institution || 'MANUU, Hyderabad'}
+                  {profileData.department ? ` • ${profileData.department}` : ''}
+                </span>
+              </div>
+
+              {isTeacher && profileData.designation ? (
+                <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold">
+                  {profileData.designation}
+                </p>
+              ) : !isTeacher && profileData.semester ? (
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                  Semester {profileData.semester}
+                  {profileData.course ? ` • ${profileData.course}` : ''}
+                </p>
+              ) : null}
             </div>
 
             {/* Inline Edit Bio Form if self editing */}

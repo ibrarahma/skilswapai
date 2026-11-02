@@ -11,20 +11,56 @@ import {
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseAppletConfig from '../../firebase-applet-config.json';
 
+function pickValidConfig(primary?: string, envFallback?: string, defaultVal = ''): string {
+  const cleanPrimary = (primary || '').trim();
+  if (
+    cleanPrimary &&
+    cleanPrimary !== 'undefined' &&
+    cleanPrimary !== 'null' &&
+    !cleanPrimary.startsWith('YOUR_') &&
+    cleanPrimary !== 'remixed-project-id'
+  ) {
+    return cleanPrimary;
+  }
+  const cleanEnv = (envFallback || '').trim();
+  if (
+    cleanEnv &&
+    cleanEnv !== 'undefined' &&
+    cleanEnv !== 'null' &&
+    !cleanEnv.startsWith('YOUR_') &&
+    cleanEnv !== '(default)'
+  ) {
+    return cleanEnv;
+  }
+  return defaultVal;
+}
+
 export const firebaseConfig = {
-  apiKey: firebaseAppletConfig.apiKey || import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: firebaseAppletConfig.authDomain || import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: firebaseAppletConfig.projectId || import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: firebaseAppletConfig.storageBucket || import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId:
-    firebaseAppletConfig.messagingSenderId || import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: firebaseAppletConfig.appId || import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: pickValidConfig(firebaseAppletConfig.apiKey, import.meta.env.VITE_FIREBASE_API_KEY),
+  authDomain: pickValidConfig(
+    firebaseAppletConfig.authDomain,
+    import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
+  ),
+  projectId: pickValidConfig(
+    firebaseAppletConfig.projectId,
+    import.meta.env.VITE_FIREBASE_PROJECT_ID
+  ),
+  storageBucket: pickValidConfig(
+    firebaseAppletConfig.storageBucket,
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+  ),
+  messagingSenderId: pickValidConfig(
+    firebaseAppletConfig.messagingSenderId,
+    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID
+  ),
+  appId: pickValidConfig(firebaseAppletConfig.appId, import.meta.env.VITE_FIREBASE_APP_ID),
 };
 
-export const firestoreDatabaseId =
-  firebaseAppletConfig.firestoreDatabaseId ||
-  import.meta.env.VITE_FIREBASE_DATABASE_ID ||
-  '(default)';
+export const firestoreDatabaseId = pickValidConfig(
+  firebaseAppletConfig.firestoreDatabaseId,
+  import.meta.env.VITE_FIREBASE_DATABASE_ID,
+  '(default)'
+);
 
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);

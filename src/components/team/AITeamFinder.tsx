@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const AITeamFinder: React.FC = () => {
-  const { users, currentUser, setSelectedUserProfile, setActiveTab } = useApp();
+  const { users, currentUser, setSelectedUserProfile, setActiveTab, openDirectChat, sendMessage, sendConnectionRequest } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [targetProjectGoal, setTargetProjectGoal] = useState('Hackathon Team');
@@ -48,13 +48,23 @@ export const AITeamFinder: React.FC = () => {
     setAiAnalyzingUserId(null);
   };
 
-  const handleSendInvite = (e: React.FormEvent) => {
+  const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    setInviteSuccess(true);
-    setTimeout(() => {
+    if (!inviteUser) return;
+    try {
+      await sendConnectionRequest(inviteUser).catch(() => {});
+      const chatId = await openDirectChat(inviteUser);
+      if (chatId && inviteMessage.trim()) {
+        await sendMessage(chatId, inviteMessage.trim());
+      }
+      setInviteSuccess(true);
+      setTimeout(() => {
+        setInviteSuccess(false);
+        setInviteUser(null);
+      }, 900);
+    } catch {
       setInviteSuccess(false);
-      setInviteUser(null);
-    }, 1200);
+    }
   };
 
   return (

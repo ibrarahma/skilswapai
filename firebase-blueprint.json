@@ -120,6 +120,32 @@
       },
       "required": ["name", "username", "email", "role"]
     },
+    "ConnectionRequest": {
+      "title": "ConnectionRequest",
+      "description": "Student-Teacher and peer connection request and relationship record",
+      "type": "object",
+      "properties": {
+        "senderUid": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderUsername": { "type": "string", "maxLength": 60 },
+        "senderAvatar": { "type": "string", "maxLength": 1000 },
+        "senderRole": { "type": "string", "enum": ["student", "teacher", "mentor", "recruiter", "admin"] },
+        "senderCollege": { "type": "string", "maxLength": 150 },
+        "senderDepartment": { "type": "string", "maxLength": 120 },
+        "receiverUid": { "type": "string", "maxLength": 128 },
+        "receiverName": { "type": "string", "maxLength": 100 },
+        "receiverUsername": { "type": "string", "maxLength": 60 },
+        "receiverAvatar": { "type": "string", "maxLength": 1000 },
+        "receiverRole": { "type": "string", "enum": ["student", "teacher", "mentor", "recruiter", "admin"] },
+        "receiverCollege": { "type": "string", "maxLength": 150 },
+        "receiverDepartment": { "type": "string", "maxLength": 120 },
+        "participants": { "type": "array", "description": "Two-element array [senderUid, receiverUid]" },
+        "status": { "type": "string", "enum": ["Pending", "Accepted", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderUid", "receiverUid", "participants", "status"]
+    },
     "SkillListing": {
       "title": "SkillListing",
       "description": "Marketplace skill listing offered or wanted by a user",
@@ -145,7 +171,12 @@
       "type": "object",
       "properties": {
         "senderUid": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderAvatar": { "type": "string", "maxLength": 1000 },
         "receiverUid": { "type": "string", "maxLength": 128 },
+        "receiverName": { "type": "string", "maxLength": 100 },
+        "receiverAvatar": { "type": "string", "maxLength": 1000 },
+        "participants": { "type": "array", "description": "Array of [senderUid, receiverUid]" },
         "offeredSkill": { "type": "string", "minLength": 1, "maxLength": 120 },
         "requestedSkill": { "type": "string", "minLength": 1, "maxLength": 120 },
         "message": { "type": "string", "maxLength": 1000 },
@@ -168,6 +199,8 @@
         "participants": { "type": "array", "description": "Array of participant UIDs" },
         "projectId": { "type": "string", "maxLength": 128 },
         "lastMessage": { "type": "string", "maxLength": 500 },
+        "lastMessageTime": { "type": "string", "maxLength": 60 },
+        "lastSenderUid": { "type": "string", "maxLength": 128 },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["type", "participants"]
@@ -179,8 +212,15 @@
       "properties": {
         "chatId": { "type": "string", "maxLength": 128 },
         "senderUid": { "type": "string", "maxLength": 128 },
+        "receiverUid": { "type": "string", "maxLength": 128 },
+        "participants": { "type": "array", "description": "Array of participant UIDs in this conversation" },
         "senderName": { "type": "string", "maxLength": 100 },
+        "senderAvatar": { "type": "string", "maxLength": 1000 },
         "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "type": { "type": "string", "enum": ["text", "file", "voice"] },
+        "fileUrl": { "type": "string", "maxLength": 2000 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "audioDuration": { "type": "string", "maxLength": 20 },
         "readBy": { "type": "array" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
@@ -215,10 +255,23 @@
         "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
         "category": { "type": "string", "maxLength": 60 },
         "authorId": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 100 },
+        "authorUsername": { "type": "string", "maxLength": 60 },
+        "authorAvatar": { "type": "string", "maxLength": 1000 },
+        "authorRole": { "type": "string", "maxLength": 40 },
+        "college": { "type": "string", "maxLength": 150 },
+        "department": { "type": "string", "maxLength": 120 },
         "status": { "type": "string", "enum": ["Idea", "In Progress", "Completed"] },
+        "visibility": { "type": "string", "enum": ["public", "private"] },
+        "published": { "type": "boolean" },
+        "techStack": { "type": "array" },
         "requiredSkills": { "type": "array" },
         "teamMembers": { "type": "array" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "files": { "type": "array" },
+        "tasks": { "type": "array" },
+        "milestones": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "description", "authorId", "status"]
     },
@@ -289,6 +342,10 @@
     "/users/{uid}": {
       "schema": { "$ref": "#/entities/User" },
       "description": "User profiles indexed by Firebase Auth UID"
+    },
+    "/connectionRequests/{requestId}": {
+      "schema": { "$ref": "#/entities/ConnectionRequest" },
+      "description": "Student-Teacher and peer connection requests and accepted connections"
     },
     "/skillListings/{listingId}": {
       "schema": { "$ref": "#/entities/SkillListing" },
