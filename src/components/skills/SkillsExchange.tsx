@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { UserProfile } from '../../types';
 import { formatDisplayName } from '../dashboard/DashboardView';
@@ -69,6 +69,17 @@ export const SkillsExchange: React.FC = () => {
   const [learnSkillInput, setLearnSkillInput] = useState('');
   const [swapMessage, setSwapMessage] = useState('');
   const [swapSuccess, setSwapSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!swapTargetUser) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSwapTargetUser(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [swapTargetUser]);
 
   const categories = [
     'All',
@@ -379,28 +390,38 @@ export const SkillsExchange: React.FC = () => {
                     <div className="flex-1 flex flex-col">
                       {/* Header */}
                       <div className="flex items-start gap-3 mb-3">
-                        <img
-                          src={member.avatar}
-                          alt={displayName}
+                        <button
+                          type="button"
                           onClick={() => setSelectedUserProfile(member)}
-                          className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 cursor-pointer shrink-0"
-                        />
+                          aria-label={`View profile of ${displayName}`}
+                          className="shrink-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        >
+                          <img
+                            src={member.avatar}
+                            alt={displayName}
+                            className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 cursor-pointer"
+                          />
+                        </button>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3
-                              onClick={() => setSelectedUserProfile(member)}
-                              className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 cursor-pointer truncate"
-                            >
-                              {displayName}
+                            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedUserProfile(member)}
+                                className="text-left group-hover:text-indigo-600 dark:group-hover:text-indigo-400 cursor-pointer truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                              >
+                                {displayName}
+                              </button>
                             </h3>
                             {member.verificationStatus === 'verified' && (
                               <ShieldCheck
                                 className="w-4 h-4 text-indigo-500 shrink-0"
                                 title="Verified Account"
+                                aria-label="Verified Account"
                               />
                             )}
                             <span
-                              className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold text-xs bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-800/50 px-2 py-0.5 rounded-lg shrink-0"
+                              className="inline-flex items-center gap-1 text-amber-800 dark:text-amber-300 font-bold text-xs bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-800/50 px-2 py-0.5 rounded-lg shrink-0"
                               title="Peer Rating"
                             >
                               <Star className="w-3 h-3 fill-amber-500 text-amber-500 shrink-0" aria-hidden="true" />
@@ -626,11 +647,14 @@ export const SkillsExchange: React.FC = () => {
                             className="w-10 h-10 rounded-full object-cover"
                           />
                           <div>
-                            <h3
-                              onClick={() => senderProfile && setSelectedUserProfile(senderProfile)}
-                              className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer"
-                            >
-                              {senderDisplayName}
+                            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => senderProfile && setSelectedUserProfile(senderProfile)}
+                                className="text-left hover:text-indigo-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                              >
+                                {senderDisplayName}
+                              </button>
                             </h3>
                             <p className="text-xs text-slate-600 dark:text-slate-300">
                               Offers{' '}
@@ -831,19 +855,28 @@ export const SkillsExchange: React.FC = () => {
                     className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col justify-between gap-4 h-full"
                   >
                     <div className="flex items-start gap-3">
-                      <img
-                        src={peerAvatar}
-                        alt={peerDisplayName}
+                      <button
+                        type="button"
                         onClick={() => setSelectedUserProfile(fallbackProfile)}
-                        className="w-12 h-12 rounded-2xl object-cover cursor-pointer shrink-0"
-                      />
+                        aria-label={`View profile of ${peerDisplayName}`}
+                        className="shrink-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                      >
+                        <img
+                          src={peerAvatar}
+                          alt={peerDisplayName}
+                          className="w-12 h-12 rounded-2xl object-cover cursor-pointer"
+                        />
+                      </button>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3
-                            onClick={() => setSelectedUserProfile(fallbackProfile)}
-                            className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer truncate"
-                          >
-                            {peerDisplayName}
+                          <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedUserProfile(fallbackProfile)}
+                              className="text-left hover:text-indigo-600 cursor-pointer truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                            >
+                              {peerDisplayName}
+                            </button>
                           </h3>
                           <span
                             className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
@@ -934,11 +967,14 @@ export const SkillsExchange: React.FC = () => {
                         />
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <h3
-                              onClick={() => senderUser && setSelectedUserProfile(senderUser)}
-                              className="text-xs font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 cursor-pointer"
-                            >
-                              {senderDisplayName}
+                            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => senderUser && setSelectedUserProfile(senderUser)}
+                                className="text-left hover:text-indigo-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                              >
+                                {senderDisplayName}
+                              </button>
                             </h3>
                             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 capitalize">
                               {req.senderRole}
@@ -1036,9 +1072,22 @@ export const SkillsExchange: React.FC = () => {
 
       {/* Swap Modal */}
       {swapTargetUser && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="skills-swap-modal-title"
+        >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
-            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+            <button
+              type="button"
+              onClick={() => setSwapTargetUser(null)}
+              aria-label="Close skill swap modal"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+            <h2 id="skills-swap-modal-title" className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1 pr-8">
               Swap Skill with {formatDisplayName(swapTargetUser.name)}
             </h2>
             <p className="text-xs text-slate-500 mb-4">
@@ -1046,17 +1095,18 @@ export const SkillsExchange: React.FC = () => {
             </p>
 
             {swapSuccess ? (
-              <div className="py-6 text-center text-emerald-600 font-semibold space-y-2">
+              <div role="status" aria-live="polite" className="py-6 text-center text-emerald-600 font-semibold space-y-2">
                 <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-500 animate-bounce" aria-hidden="true" />
                 <p>Skill Swap Request Delivered!</p>
               </div>
             ) : (
               <form onSubmit={handleSwapSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="skills-swap-teach" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Skill You Will Teach
                   </label>
                   <input
+                    id="skills-swap-teach"
                     type="text"
                     required
                     value={teachSkillInput}
@@ -1065,10 +1115,11 @@ export const SkillsExchange: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="skills-swap-learn" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Skill You Want To Learn
                   </label>
                   <input
+                    id="skills-swap-learn"
                     type="text"
                     required
                     value={learnSkillInput}
@@ -1077,10 +1128,11 @@ export const SkillsExchange: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="skills-swap-message" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Personal Message
                   </label>
                   <textarea
+                    id="skills-swap-message"
                     rows={3}
                     placeholder="Hey! Are you free for a 1-hour session over Google Meet?"
                     value={swapMessage}

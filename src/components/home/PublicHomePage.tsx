@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Sparkles,
@@ -94,6 +94,18 @@ export const PublicHomePage: React.FC = () => {
   const [contactSubject, setContactSubject] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSubmitted, setContactSubmitted] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (privacyModalOpen) setPrivacyModalOpen(false);
+        if (termsModalOpen) setTermsModalOpen(false);
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [privacyModalOpen, termsModalOpen, mobileMenuOpen]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -274,26 +286,26 @@ export const PublicHomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-sans transition-colors duration-200">
+      <a
+        href="#public-main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-purple-700 focus:text-white focus:text-xs focus:font-bold focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       {/* ========================================================================= */}
       {/* SECTION A — NAVIGATION BAR                                                */}
       {/* ========================================================================= */}
       <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           {/* Left: Brand Logo & Institution Lockup */}
-          <div
+          <button
+            type="button"
             onClick={() => scrollToSection('home')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                scrollToSection('home');
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            className="flex items-center gap-3 cursor-pointer group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            aria-label="SkillSwap AI MANUU ECE Home"
+            className="flex items-center gap-3 text-left cursor-pointer group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-700 via-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
+              <Sparkles className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -311,7 +323,7 @@ export const PublicHomePage: React.FC = () => {
                 Maulana Azad National Urdu University · Hyderabad
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Center: Desktop Navigation Links */}
           <nav aria-label="Primary Navigation" className="hidden md:flex items-center gap-1 lg:gap-2">
@@ -437,6 +449,7 @@ export const PublicHomePage: React.FC = () => {
         )}
       </header>
 
+      <main id="public-main-content" tabIndex={-1} className="outline-none">
       {/* ========================================================================= */}
       {/* SECTION B — HERO SECTION                                                  */}
       {/* ========================================================================= */}
@@ -972,9 +985,9 @@ export const PublicHomePage: React.FC = () => {
                 <span className={`inline-block ${TYPOGRAPHY.caption} tracking-wide ${TEXT_COLOR.accent}`}>
                   Get in Touch
                 </span>
-                <h3 className={`${TYPOGRAPHY.h2} ${TEXT_COLOR.heading} mt-1`}>
+                <h2 className={`${TYPOGRAPHY.h2} ${TEXT_COLOR.heading} mt-1`}>
                   Connect With MANUU ECE
-                </h3>
+                </h2>
                 <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.body} mt-2`}>
                   Have questions about student participation, faculty mentorship, or electronic hardware contributions? Reach out to our campus team.
                 </p>
@@ -985,11 +998,11 @@ export const PublicHomePage: React.FC = () => {
                   <div
                     className={`p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ${TEXT_COLOR.accent} shrink-0`}
                   >
-                    <Building2 className="w-4 h-4" />
+                    <Building2 className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div>
-                    {/* Fixes Issue #9: Semantic H4 heading under H3 while preserving visual styling */}
-                    <h4 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Institution</h4>
+                    {/* Fixes Issue #9: Semantic H3 heading under H2 while preserving visual styling */}
+                    <h3 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Institution</h3>
                     <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.body}`}>
                       Maulana Azad National Urdu University (MANUU)
                     </p>
@@ -1003,11 +1016,11 @@ export const PublicHomePage: React.FC = () => {
                   <div
                     className={`p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ${TEXT_COLOR.accent} shrink-0`}
                   >
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div>
-                    {/* Fixes Issue #9: Semantic H4 heading under H3 */}
-                    <h4 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Department Location</h4>
+                    {/* Fixes Issue #9: Semantic H3 heading under H2 */}
+                    <h3 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Department Location</h3>
                     <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.body}`}>
                       Department of Electronics and Communication Engineering (ECE)
                     </p>
@@ -1021,13 +1034,13 @@ export const PublicHomePage: React.FC = () => {
                   <div
                     className={`p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ${TEXT_COLOR.accent} shrink-0`}
                   >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div>
-                    {/* Fixes Issue #9: Semantic H4 heading under H3 */}
-                    <h4 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>
+                    {/* Fixes Issue #9: Semantic H3 heading under H2 */}
+                    <h3 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>
                       Project Correspondence
-                    </h4>
+                    </h3>
                     <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.body}`}>
                       skillswap.ece@manuu.edu.in
                     </p>
@@ -1038,17 +1051,17 @@ export const PublicHomePage: React.FC = () => {
 
             {/* Interactive Campus Inquiry Form */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-              <h4 className={`${TYPOGRAPHY.h3Card} ${TEXT_COLOR.heading} mb-1`}>
+              <h3 className={`${TYPOGRAPHY.h3Card} ${TEXT_COLOR.heading} mb-1`}>
                 Send an Inquiry or Feedback
-              </h4>
+              </h3>
               <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.muted} mb-5`}>
                 We welcome suggestions from students, faculty, and industry mentors.
               </p>
 
               {contactSubmitted ? (
-                <div className="p-6 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-center space-y-3">
-                  <CheckCircle2 className={`w-10 h-10 ${TEXT_COLOR.accent} mx-auto`} />
-                  <h5 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Message Received</h5>
+                <div role="status" aria-live="polite" className="p-6 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-center space-y-3">
+                  <CheckCircle2 className={`w-10 h-10 ${TEXT_COLOR.accent} mx-auto`} aria-hidden="true" />
+                  <h4 className={`${TYPOGRAPHY.h4} ${TEXT_COLOR.heading}`}>Message Received</h4>
                   <p className={`${TYPOGRAPHY.body} ${TEXT_COLOR.body}`}>
                     Thank you for reaching out! Your inquiry has been noted by the project coordinators.
                   </p>
@@ -1195,6 +1208,7 @@ export const PublicHomePage: React.FC = () => {
           </footer>
         </div>
       </section>
+      </main>
 
       {/* ========================================================================= */}
       {/* PRIVACY POLICY MODAL                                                      */}

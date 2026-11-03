@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { UserProfile } from '../../types';
 import { calculateTeamMatchWithAI } from '../../lib/gemini';
 import {
   Sparkles, Search, ShieldCheck, GraduationCap,
-  Send, CheckCircle2, RefreshCw, Target
+  Send, CheckCircle2, RefreshCw, Target, X
 } from 'lucide-react';
 
 // Issue 1: Maximum of 5 reusable button variants with accessible focus states
@@ -47,6 +47,17 @@ export const AITeamFinder: React.FC = () => {
   const [inviteUser, setInviteUser] = useState<UserProfile | null>(null);
   const [inviteMessage, setInviteMessage] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!inviteUser) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setInviteUser(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [inviteUser]);
 
   const dynamicColleges = Array.from(
     new Set(users.filter(u => u.id !== currentUser.id && u.college).map(u => u.college))
@@ -381,22 +392,31 @@ export const AITeamFinder: React.FC = () => {
             aria-labelledby="invite-team-modal-title"
             className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4"
           >
-            <h2 id="invite-team-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+            <button
+              type="button"
+              onClick={() => setInviteUser(null)}
+              aria-label="Close invitation modal"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+            <h2 id="invite-team-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100 pr-8">
               Invite {formatCandidateDisplayName(inviteUser.name)} to Team
             </h2>
 
             {inviteSuccess ? (
-              <div className="py-6 text-center text-emerald-600 dark:text-emerald-400 font-semibold space-y-2">
-                <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-600 dark:text-emerald-400 animate-bounce" />
+              <div role="status" aria-live="polite" className="py-6 text-center text-emerald-600 dark:text-emerald-400 font-semibold space-y-2">
+                <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-600 dark:text-emerald-400 animate-bounce" aria-hidden="true" />
                 <p className="text-xs">Team Invitation Sent!</p>
               </div>
             ) : (
               <form onSubmit={handleSendInvite} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label htmlFor="team-invite-goal" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
                     Target Project / Goal
                   </label>
                   <input
+                    id="team-invite-goal"
                     type="text"
                     disabled
                     value={targetProjectGoal}
@@ -404,10 +424,11 @@ export const AITeamFinder: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label htmlFor="team-invite-message" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
                     Personalized Message
                   </label>
                   <textarea
+                    id="team-invite-message"
                     rows={3}
                     value={inviteMessage}
                     onChange={(e) => setInviteMessage(e.target.value)}

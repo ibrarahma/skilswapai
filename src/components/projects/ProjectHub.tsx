@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ProjectItem, ProjectFile } from '../../types';
 import {
@@ -200,6 +200,17 @@ export const ProjectHub: React.FC = () => {
   const [requiredSkillsInput, setRequiredSkillsInput] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<ProjectFile[]>([]);
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (detailProject) setDetailProject(null);
+        if (createModalOpen) setCreateModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [detailProject, createModalOpen]);
 
   const categories = [
     'All',
@@ -854,9 +865,10 @@ export const ProjectHub: React.FC = () => {
                     {/* Separated Author Metadata & Accessible Social Actions Footer (Issues 2, 5, 9) */}
                     <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
                       {/* Author & >=12px (text-xs) University/Date Metadata */}
-                      <div
+                      <button
+                        type="button"
                         onClick={() => handleOpenAuthorProfile(project)}
-                        className="flex items-center gap-2.5 cursor-pointer group/author min-w-0"
+                        className="flex items-center gap-2.5 text-left cursor-pointer group/author min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                       >
                         <img
                           src={project.authorAvatar}
@@ -876,7 +888,7 @@ export const ProjectHub: React.FC = () => {
                             {project.college || 'MANUU, Hyderabad'} • {project.createdAt}
                           </p>
                         </div>
-                      </div>
+                      </button>
 
                       {/* Issue 9: >=40x40px Accessible Upvote & Comment Icon Buttons + View Details */}
                       <div className="flex items-center gap-2 shrink-0">
@@ -1168,13 +1180,14 @@ export const ProjectHub: React.FC = () => {
 
             {/* Author Card */}
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div
+              <button
+                type="button"
                 onClick={() => {
                   const target = activeDetailProject;
                   setDetailProject(null);
                   handleOpenAuthorProfile(target);
                 }}
-                className="flex items-center gap-3 cursor-pointer"
+                className="flex items-center gap-3 text-left cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
               >
                 <img
                   src={activeDetailProject.authorAvatar}
@@ -1189,7 +1202,7 @@ export const ProjectHub: React.FC = () => {
                     {activeDetailProject.college} • Published {activeDetailProject.createdAt}
                   </p>
                 </div>
-              </div>
+              </button>
 
               <div className="flex items-center gap-2 flex-wrap">
                 <button
@@ -1564,13 +1577,13 @@ export const ProjectHub: React.FC = () => {
 
               {/* Project Attachments Upload */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+                <label htmlFor="project-attachment-file" className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
                   Project Attachments (PDF, Diagrams, Code, Schematics)
                 </label>
-                <label className="flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 cursor-pointer text-xs text-slate-600 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40">
-                  <Upload className="w-4 h-4 text-indigo-600" />
+                <label htmlFor="project-attachment-file" className="flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 focus-within:ring-2 focus-within:ring-purple-500 cursor-pointer text-xs text-slate-600 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40">
+                  <Upload className="w-4 h-4 text-indigo-600" aria-hidden="true" />
                   <span>Select file to attach (up to 450 KB)</span>
-                  <input type="file" onChange={handleFileChange} className="hidden" />
+                  <input id="project-attachment-file" type="file" onChange={handleFileChange} className="sr-only" />
                 </label>
 
                 {fileUploadError && (

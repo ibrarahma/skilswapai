@@ -232,20 +232,30 @@ export const DashboardView: React.FC = () => {
                   You haven't listed any teaching skills yet. Add your skills in Settings or on your Profile!
                 </div>
               ) : (
-                currentUser.skillsToTeach.map((s, i) => (
-                  <div key={s.id}>
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      <span>{s.name} ({s.category})</span>
-                      <span className="text-indigo-600 dark:text-indigo-400">{s.level} • {Math.min(100, 80 + i * 5)}%</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                currentUser.skillsToTeach.map((s, i) => {
+                  const pct = Math.min(100, 80 + i * 5);
+                  return (
+                    <div key={s.id}>
+                      <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        <span>{s.name} ({s.category})</span>
+                        <span className="text-indigo-700 dark:text-indigo-300">{s.level} • {pct}%</span>
+                      </div>
                       <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, 80 + i * 5)}%` }}
-                      ></div>
+                        role="progressbar"
+                        aria-label={`${s.name} mastery progress`}
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden"
+                      >
+                        <div
+                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        ></div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -272,7 +282,7 @@ export const DashboardView: React.FC = () => {
             </div>
 
             {recommendedTeammates.length === 0 ? (
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-600 dark:text-slate-300">
                 No other registered students found yet. As genuine classmates register, their profiles will appear here!
               </div>
             ) : (
@@ -280,8 +290,17 @@ export const DashboardView: React.FC = () => {
                 {recommendedTeammates.map((u) => (
                   <div
                     key={u.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View profile of ${formatDisplayName(u.name)}, ${u.compatibilityScore || 90}% match`}
                     onClick={() => setSelectedUserProfile(u)}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all space-y-3"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedUserProfile(u);
+                      }
+                    }}
+                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all space-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   >
                     <div className="flex items-start gap-3">
                       <img
@@ -300,13 +319,13 @@ export const DashboardView: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/70 dark:border-slate-700/50 flex-wrap">
-                      <span className="inline-flex items-center text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 shrink-0">
+                      <span className="inline-flex items-center text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 shrink-0">
                         {u.compatibilityScore || 90}% Match
                       </span>
 
                       <div className="flex flex-wrap gap-1.5">
                         {u.skillsToTeach.slice(0, 2).map((st) => (
-                          <span key={st.id} className="text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-medium">
+                          <span key={st.id} className="text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 font-medium">
                             {st.name}
                           </span>
                         ))}

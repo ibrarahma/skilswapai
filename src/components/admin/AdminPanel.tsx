@@ -1,9 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import {
-  ShieldCheck, Users, GraduationCap, CheckCircle2, XCircle,
-  BarChart3, FileText, AlertTriangle, ArrowUpRight
-} from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export const AdminPanel: React.FC = () => {
   const { users, setUsers } = useApp();
@@ -25,7 +22,7 @@ export const AdminPanel: React.FC = () => {
       <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold mb-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
             <span>College Administration & Moderation Portal</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
@@ -40,51 +37,51 @@ export const AdminPanel: React.FC = () => {
       {/* Analytics Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Total Enrolled Students</span>
+          <span className="text-xs uppercase font-bold text-slate-600 dark:text-slate-300">Total Enrolled Students</span>
           <div className="text-xl font-extrabold text-slate-800 dark:text-slate-100">{users.length + 1420}</div>
-          <p className="text-[10px] text-emerald-600 font-semibold">↑ 12% growth this semester</p>
+          <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">↑ 12% growth this semester</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Skill Swaps Completed</span>
+          <span className="text-xs uppercase font-bold text-slate-600 dark:text-slate-300">Skill Swaps Completed</span>
           <div className="text-xl font-extrabold text-slate-800 dark:text-slate-100">3,840 hrs</div>
-          <p className="text-[10px] text-indigo-600 font-semibold">Peer peer mentoring</p>
+          <p className="text-xs text-indigo-600 dark:text-indigo-300 font-semibold">Peer-to-peer mentoring</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Verified Badges Issued</span>
+          <span className="text-xs uppercase font-bold text-slate-600 dark:text-slate-300">Verified Badges Issued</span>
           <div className="text-xl font-extrabold text-slate-800 dark:text-slate-100">892</div>
-          <p className="text-[10px] text-purple-600 font-semibold">IIT & NIT certified</p>
+          <p className="text-xs text-purple-700 dark:text-purple-300 font-semibold">IIT & NIT certified</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Pending Identity Checks</span>
-          <div className="text-xl font-extrabold text-amber-600">{pendingVerifications.length}</div>
-          <p className="text-[10px] text-slate-400">Requires Admin action</p>
+          <span className="text-xs uppercase font-bold text-slate-600 dark:text-slate-300">Pending Identity Checks</span>
+          <div className="text-xl font-extrabold text-amber-800 dark:text-amber-300">{pendingVerifications.length}</div>
+          <p className="text-xs text-slate-600 dark:text-slate-300">Requires Admin action</p>
         </div>
       </div>
 
       {/* Pending Verifications Table */}
       <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-indigo-600" />
+        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />
           <span>Student College ID Verification Queue</span>
-        </h3>
+        </h2>
 
         {pendingVerifications.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+          <div className="p-6 text-center text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
             All student verification requests are currently cleared!
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-[10px] font-bold uppercase text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
                 <tr>
-                  <th className="p-3 rounded-l-xl">Student</th>
-                  <th className="p-3">College & Department</th>
-                  <th className="p-3">Semester</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right rounded-r-xl">Action</th>
+                  <th scope="col" className="p-3 rounded-l-xl">Student</th>
+                  <th scope="col" className="p-3">College & Department</th>
+                  <th scope="col" className="p-3">Semester</th>
+                  <th scope="col" className="p-3">Status</th>
+                  <th scope="col" className="p-3 text-right rounded-r-xl">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -96,17 +93,19 @@ export const AdminPanel: React.FC = () => {
                     </td>
                     <td className="p-3">{student.college} • {student.department}</td>
                     <td className="p-3">{student.semester} Semester</td>
-                    <td className="p-3 font-semibold text-amber-600">Pending Verification</td>
+                    <td className="p-3 font-semibold text-amber-800 dark:text-amber-300">Pending Verification</td>
                     <td className="p-3 text-right space-x-2">
                       <button
+                        type="button"
                         onClick={() => handleApproveVerification(student.id)}
-                        className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-semibold text-[11px] shadow-sm hover:bg-emerald-700 transition-all"
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold text-xs shadow-sm hover:bg-emerald-700 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                       >
                         Approve ID
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleRejectVerification(student.id)}
-                        className="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-semibold text-[11px] hover:bg-rose-200 transition-all"
+                        className="px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-semibold text-xs hover:bg-rose-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                       >
                         Reject
                       </button>
@@ -122,3 +121,4 @@ export const AdminPanel: React.FC = () => {
     </div>
   );
 };
+

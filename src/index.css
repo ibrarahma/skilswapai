@@ -1,2 +1,85 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: clip;
+    min-width: 320px;
+  }
+
+  /* WCAG 2.2 AA Global Keyboard Focus Visibility */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+  }
+
+  .dark a:focus-visible,
+  .dark button:focus-visible,
+  .dark input:focus-visible,
+  .dark select:focus-visible,
+  .dark textarea:focus-visible,
+  .dark summary:focus-visible,
+  .dark [role="button"]:focus-visible,
+  .dark [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline-color: #818cf8;
+  }
+}
+
+/*
+ * WCAG 2.2 AA Color Contrast Safeguards (Minimum 4.5:1 for normal text, 3:1 for large text)
+ * Resolves Floto reported low-contrast tokens:
+ * - #90a1b9 (slate-400 on light backgrounds) -> upgraded to #475569 (7.1:1 on #f8fafc)
+ * - #62748e (slate-500 on dark backgrounds) -> upgraded to #cbd5e1 (9.4:1 on #162034)
+ * - #4f39f6 (indigo-600 on dark backgrounds #0f172b / #162034) -> upgraded to #a5b4fc (7.4:1)
+ * - #e17100 (amber-600 on light backgrounds) -> upgraded to #b45309 (4.7:1 on #f8fafc)
+ */
+html:not(.dark) .text-slate-400 {
+  color: #475569;
+}
+
+html:not(.dark) .text-slate-500 {
+  color: #475569;
+}
+
+html:not(.dark) .text-amber-600,
+html:not(.dark) .text-amber-500 {
+  color: #b45309;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+html.dark .text-slate-400,
+html.dark .text-slate-500 {
+  color: #cbd5e1;
+}
+
+html.dark .text-indigo-600 {
+  color: #a5b4fc;
+}
+
+html.dark .text-amber-600,
+html.dark .text-amber-500 {
+  color: #fcd34d;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
